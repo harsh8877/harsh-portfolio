@@ -273,7 +273,7 @@ export default function Contact() {
             transition={{ duration: 0.6 }}
             className="lg:col-span-7"
           >
-            <div className="p-6 sm:p-10 rounded-3xl bg-white/90 dark:bg-navy-card/90 border border-slate-200 dark:border-navy-border shadow-xl backdrop-blur-md">
+            <div className="p-5 sm:p-10 rounded-3xl bg-white/90 dark:bg-navy-card/90 border border-slate-200 dark:border-navy-border shadow-xl backdrop-blur-md">
               <AnimatePresence mode="wait">
                 {isSuccess ? (
                   /* Animated Success State */

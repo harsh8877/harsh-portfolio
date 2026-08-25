@@ -245,7 +245,7 @@ export default function Skills() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-12"
+          className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-3 mb-10 sm:mb-12 px-1"
         >
           {CATEGORIES.map((tab) => {
             const Icon = tab.icon;
@@ -254,7 +254,7 @@ export default function Skills() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`relative flex items-center gap-2 px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 cursor-pointer ${
+                className={`relative flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 cursor-pointer min-h-[36px] sm:min-h-[40px] ${
                   isActive
                     ? "text-white dark:text-white font-semibold shadow-md shadow-violet-accent/25"
                     : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 bg-white/70 dark:bg-navy-card/60 border border-slate-200 dark:border-navy-border hover:border-violet-accent/30"
@@ -267,7 +267,7 @@ export default function Skills() {
                     transition={{ type: "spring", stiffness: 350, damping: 30 }}
                   />
                 )}
-                <Icon className="w-4 h-4" />
+                <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 <span>{tab.label}</span>
               </button>
             );
@@ -280,7 +280,7 @@ export default function Skills() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.1 }}
-          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3.5 sm:gap-4 md:gap-5"
+          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2.5 sm:gap-4 md:gap-5"
         >
           <AnimatePresence mode="popLayout">
             {filteredSkills.map((skill) => {
@@ -291,13 +291,13 @@ export default function Skills() {
                   variants={itemVariants}
                   layout
                   whileHover={{
-                    scale: 1.06,
-                    y: -5,
+                    scale: 1.05,
+                    y: -4,
                     boxShadow: `0 16px 30px -10px ${skill.color}30`,
                     borderColor: `${skill.color}80`,
                   }}
                   whileTap={{ scale: 0.96 }}
-                  className="group relative flex flex-col items-center justify-between p-4 sm:p-5 rounded-2xl bg-white/80 dark:bg-navy-card/90 border border-slate-200 dark:border-navy-border shadow-sm hover:shadow-xl backdrop-blur-md transition-all duration-300 cursor-pointer overflow-hidden min-h-[140px] sm:min-h-[155px]"
+                  className="group relative flex flex-col items-center justify-between p-3.5 sm:p-5 rounded-2xl bg-white/80 dark:bg-navy-card/90 border border-slate-200 dark:border-navy-border shadow-sm hover:shadow-xl backdrop-blur-md transition-all duration-300 cursor-pointer overflow-hidden min-h-[135px] sm:min-h-[155px]"
                 >
                   {/* Subtle top ambient glow inside the card on hover */}
                   <div
@@ -307,13 +307,13 @@ export default function Skills() {
 
                   {/* Skill Icon */}
                   <div
-                    className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center p-2.5 transition-transform duration-300 group-hover:scale-110"
+                    className="w-11 h-11 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center p-2 sm:p-2.5 transition-transform duration-300 group-hover:scale-110"
                     style={{
                       backgroundColor: `${skill.color}15`,
                     }}
                   >
                     <Icon
-                      className="w-7 h-7 sm:w-8 sm:h-8 transition-colors duration-300"
+                      className="w-6 h-6 sm:w-8 sm:h-8 transition-colors duration-300"
                       style={{ color: skill.color }}
                     />
                   </div>

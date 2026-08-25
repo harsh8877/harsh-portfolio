@@ -223,10 +223,10 @@ export default function About() {
             </div>
 
             {/* Action Links */}
-            <div className="flex flex-wrap items-center gap-4">
+            <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full sm:w-auto">
               <a
                 href="#projects"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-violet-accent to-electric-blue text-white font-medium text-sm shadow-md shadow-violet-accent/20 hover:shadow-electric-blue/30 hover:scale-105 active:scale-95 transition-all duration-200"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-violet-accent to-electric-blue text-white font-medium text-sm shadow-md shadow-violet-accent/20 hover:shadow-electric-blue/30 hover:scale-105 active:scale-95 transition-all duration-200 min-h-[44px]"
               >
                 <span>View My Projects</span>
                 <FiArrowRight className="w-4 h-4" />
@@ -237,7 +237,7 @@ export default function About() {
                 target="_blank"
                 rel="noopener noreferrer"
                 download="Harsh_Vasoya_Resume.pdf"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-slate-300 dark:border-navy-border bg-white/80 dark:bg-navy-card/80 text-slate-800 dark:text-slate-200 hover:text-violet-accent dark:hover:text-electric-blue hover:border-violet-accent/40 font-medium text-sm backdrop-blur-md hover:scale-105 active:scale-95 transition-all duration-200 shadow-sm"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-slate-300 dark:border-navy-border bg-white/80 dark:bg-navy-card/80 text-slate-800 dark:text-slate-200 hover:text-violet-accent dark:hover:text-electric-blue hover:border-violet-accent/40 font-medium text-sm backdrop-blur-md hover:scale-105 active:scale-95 transition-all duration-200 shadow-sm min-h-[44px]"
               >
                 <FiDownload className="w-4 h-4" />
                 <span>Resume</span>

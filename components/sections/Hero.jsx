@@ -132,21 +132,23 @@ export default function Hero() {
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:28px_28px] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_50%,#000_70%,transparent_100%)]" />
       </div>
 
-      <div className="max-w-4xl mx-auto text-center relative z-10">
+      <div className="max-w-4xl mx-auto text-center relative z-10 w-full">
         {/* Location & Status Badge */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="inline-flex items-center gap-2 rounded-full border border-slate-300/80 dark:border-navy-border bg-white/80 dark:bg-navy-card/80 px-4 py-1.5 text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 backdrop-blur-md shadow-sm mb-6 sm:mb-8"
+          className="inline-flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 rounded-full border border-slate-300/80 dark:border-navy-border bg-white/85 dark:bg-navy-card/85 px-3.5 sm:px-4 py-1.5 text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 backdrop-blur-md shadow-sm mb-6 sm:mb-8 max-w-full"
         >
-          <span className="relative flex h-2.5 w-2.5">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-          </span>
-          <span>Available for opportunities</span>
-          <span className="text-slate-300 dark:text-slate-600">•</span>
-          <span className="flex items-center gap-1 text-slate-500 dark:text-slate-400">
+          <div className="flex items-center gap-1.5">
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+            </span>
+            <span className="whitespace-nowrap">Available for opportunities</span>
+          </div>
+          <span className="text-slate-300 dark:text-slate-600 hidden xs:inline">•</span>
+          <span className="flex items-center gap-1 text-slate-500 dark:text-slate-400 whitespace-nowrap">
             <FiMapPin className="h-3.5 w-3.5 text-violet-accent" />
             Surat, Gujarat, India
           </span>
@@ -158,10 +160,10 @@ export default function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
         >
-          <p className="text-sm sm:text-base md:text-lg font-medium text-violet-accent dark:text-electric-blue mb-2 font-poppins tracking-wide uppercase">
+          <p className="text-xs sm:text-base md:text-lg font-medium text-violet-accent dark:text-electric-blue mb-2 font-poppins tracking-wider uppercase">
             Hi, I&apos;m
           </p>
-          <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold font-poppins tracking-tight text-slate-900 dark:text-white mb-4">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold font-poppins tracking-tight text-slate-900 dark:text-white mb-3 sm:mb-4 leading-tight">
             <span className="bg-gradient-to-r from-slate-900 via-violet-900 to-slate-900 dark:from-white dark:via-slate-100 dark:to-slate-300 bg-clip-text text-transparent">
               Harsh Vasoya
             </span>
@@ -173,14 +175,14 @@ export default function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="h-10 sm:h-12 flex items-center justify-center mb-6"
+          className="min-h-[2.5rem] sm:min-h-[3rem] flex items-center justify-center mb-5 sm:mb-6"
         >
-          <p className="text-lg sm:text-2xl md:text-3xl font-semibold font-poppins text-slate-700 dark:text-slate-200">
+          <p className="text-base sm:text-2xl md:text-3xl font-semibold font-poppins text-slate-700 dark:text-slate-200">
             I am a{" "}
             <span className="bg-gradient-to-r from-violet-accent to-electric-blue bg-clip-text text-transparent font-bold">
               {typedRole}
             </span>
-            <span className="inline-block w-[3px] h-6 sm:h-8 ml-1 bg-electric-blue align-middle animate-pulse" />
+            <span className="inline-block w-[3px] h-5 sm:h-7 ml-1 bg-electric-blue align-middle animate-pulse" />
           </p>
         </motion.div>
 
@@ -189,7 +191,7 @@ export default function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
-          className="text-slate-600 dark:text-slate-400 text-base sm:text-lg md:text-xl max-w-2xl mx-auto leading-relaxed mb-8 sm:mb-10"
+          className="text-slate-600 dark:text-slate-400 text-sm sm:text-lg md:text-xl max-w-2xl mx-auto leading-relaxed mb-8 sm:mb-10 px-2"
         >
           Passionate about crafting dynamic, responsive, and high-performance web
           applications with modern React.js, Next.js, and clean scalable code.
@@ -200,32 +202,32 @@ export default function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-5 mb-10 sm:mb-12"
+          className="flex flex-col sm:flex-row items-center justify-center gap-3.5 sm:gap-5 mb-10 sm:mb-12 w-full max-w-xs sm:max-w-none mx-auto"
         >
           {/* Download Resume Button */}
           <motion.a
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.04 }}
+            whileTap={{ scale: 0.96 }}
             href="/resume.pdf"
             target="_blank"
             rel="noopener noreferrer"
             download="Harsh_Vasoya_Resume.pdf"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-xl bg-gradient-to-r from-violet-accent to-electric-blue text-white font-medium text-base shadow-lg shadow-violet-accent/25 hover:shadow-electric-blue/30 transition-all duration-300 cursor-pointer"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 sm:px-7 py-3.5 rounded-xl bg-gradient-to-r from-violet-accent to-electric-blue text-white font-medium text-sm sm:text-base shadow-lg shadow-violet-accent/25 hover:shadow-electric-blue/30 transition-all duration-300 cursor-pointer min-h-[48px]"
           >
-            <FiDownload className="h-5 w-5" />
+            <FiDownload className="h-4 sm:h-5 w-4 sm:w-5" />
             <span>Download Resume</span>
           </motion.a>
 
           {/* Contact Me Button */}
           <motion.a
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.04 }}
+            whileTap={{ scale: 0.96 }}
             href="#contact"
             onClick={scrollToContact}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-xl border border-slate-300 dark:border-navy-border bg-white/70 dark:bg-navy-card/80 text-slate-800 dark:text-slate-200 hover:text-violet-accent dark:hover:text-electric-blue hover:border-violet-accent/40 dark:hover:border-electric-blue/40 font-medium text-base backdrop-blur-md transition-all duration-300 shadow-sm cursor-pointer"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 sm:px-7 py-3.5 rounded-xl border border-slate-300 dark:border-navy-border bg-white/80 dark:bg-navy-card/80 text-slate-800 dark:text-slate-200 hover:text-violet-accent dark:hover:text-electric-blue hover:border-violet-accent/40 dark:hover:border-electric-blue/40 font-medium text-sm sm:text-base backdrop-blur-md transition-all duration-300 shadow-sm cursor-pointer min-h-[48px]"
           >
             <span>Contact Me</span>
-            <FiArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+            <FiArrowRight className="h-4 sm:h-5 w-4 sm:w-5 transition-transform group-hover:translate-x-1" />
           </motion.a>
         </motion.div>
 
@@ -247,9 +249,9 @@ export default function Hero() {
                 aria-label={social.name}
                 whileHover={{ scale: 1.12, y: -2 }}
                 whileTap={{ scale: 0.92 }}
-                className={`p-3 rounded-xl border border-slate-200 dark:border-navy-border bg-white/80 dark:bg-navy-card/80 text-slate-600 dark:text-slate-300 shadow-sm backdrop-blur-md transition-all duration-200 cursor-pointer ${social.hoverClass}`}
+                className={`p-3 sm:p-3.5 rounded-xl border border-slate-200 dark:border-navy-border bg-white/80 dark:bg-navy-card/80 text-slate-600 dark:text-slate-300 shadow-sm backdrop-blur-md transition-all duration-200 cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center ${social.hoverClass}`}
               >
-                <Icon className="h-5 w-5" />
+                <Icon className="h-4 sm:h-5 w-4 sm:h-5" />
               </motion.a>
             );
           })}
