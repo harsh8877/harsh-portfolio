@@ -1,8 +1,8 @@
 import Hero from "@/components/sections/Hero";
+import About from "@/components/sections/About";
 
 export default function Home() {
   const sections = [
-    { id: "about", title: "About Me", desc: "Personal background, passion for development, and journey." },
     { id: "skills", title: "Technical Skills", desc: "Frontend, Backend, DevOps, Tools, and Frameworks." },
     { id: "experience", title: "Work Experience", desc: "Professional roles, contributions, and milestones." },
     { id: "projects", title: "Featured Projects", desc: "Showcase of web apps, case studies, and live demos." },
@@ -14,6 +14,9 @@ export default function Home() {
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
       <Hero />
+
+      {/* About Section */}
+      <About />
 
       {/* Remaining Portfolio Sections */}
       {sections.map((section, idx) => (
