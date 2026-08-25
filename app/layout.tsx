@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Poppins } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -17,8 +18,8 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Harsh Vasoya | Portfolio",
-  description: "Personal portfolio website of Harsh Vasoya built with Next.js, Tailwind CSS, and Framer Motion",
+  title: "Harsh Vasoya | MERN Stack Developer Portfolio",
+  description: "Personal portfolio website of Harsh Vasoya - MERN Stack Developer specializing in React.js, Next.js, and modern full-stack web applications.",
 };
 
 export default function RootLayout({
@@ -36,6 +37,7 @@ export default function RootLayout({
         <div className="pt-20 flex-1 flex flex-col">
           {children}
         </div>
+        <Footer />
       </body>
     </html>
   );
