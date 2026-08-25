@@ -1,9 +1,9 @@
 import Hero from "@/components/sections/Hero";
 import About from "@/components/sections/About";
+import Skills from "@/components/sections/Skills";
 
 export default function Home() {
   const sections = [
-    { id: "skills", title: "Technical Skills", desc: "Frontend, Backend, DevOps, Tools, and Frameworks." },
     { id: "experience", title: "Work Experience", desc: "Professional roles, contributions, and milestones." },
     { id: "projects", title: "Featured Projects", desc: "Showcase of web apps, case studies, and live demos." },
     { id: "education", title: "Education & Certifications", desc: "Degrees, academic achievements, and courses." },
@@ -17,6 +17,9 @@ export default function Home() {
 
       {/* About Section */}
       <About />
+
+      {/* Skills Section */}
+      <Skills />
 
       {/* Remaining Portfolio Sections */}
       {sections.map((section, idx) => (
