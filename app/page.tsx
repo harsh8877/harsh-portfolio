@@ -1,10 +1,10 @@
 import Hero from "@/components/sections/Hero";
 import About from "@/components/sections/About";
 import Skills from "@/components/sections/Skills";
+import Experience from "@/components/sections/Experience";
 
 export default function Home() {
   const sections = [
-    { id: "experience", title: "Work Experience", desc: "Professional roles, contributions, and milestones." },
     { id: "projects", title: "Featured Projects", desc: "Showcase of web apps, case studies, and live demos." },
     { id: "education", title: "Education & Certifications", desc: "Degrees, academic achievements, and courses." },
     { id: "contact", title: "Get In Touch", desc: "Contact form, email, and social links." },
@@ -20,6 +20,9 @@ export default function Home() {
 
       {/* Skills Section */}
       <Skills />
+
+      {/* Experience Section */}
+      <Experience />
 
       {/* Remaining Portfolio Sections */}
       {sections.map((section, idx) => (
