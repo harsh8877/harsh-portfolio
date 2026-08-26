@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiSun, FiMoon, FiMenu, FiX } from "react-icons/fi";
 import { useLenis } from "./SmoothScrollProvider";
+import Magnetic from "./Magnetic";
 
 const NAV_LINKS = [
   { name: "Home", href: "#home" },
@@ -151,18 +152,21 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <a
-            href="#home"
-            onClick={(e) => handleNavClick(e, "#home")}
-            className="group flex items-center gap-2 text-xl font-bold font-poppins tracking-tight text-slate-900 dark:text-white"
-          >
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-violet-accent to-electric-blue text-white shadow-md shadow-violet-accent/20 group-hover:scale-105 transition-transform duration-200 text-sm font-extrabold">
-              HV
-            </span>
-            <span className="bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 dark:from-white dark:via-slate-200 dark:to-slate-400 bg-clip-text text-transparent group-hover:from-violet-accent group-hover:to-electric-blue transition-all duration-300">
-              Harsh Vasoya
-            </span>
-          </a>
+          <Magnetic maxDistance={12}>
+            <a
+              href="#home"
+              onClick={(e) => handleNavClick(e, "#home")}
+              data-cursor="hover"
+              className="group flex items-center gap-2 text-xl font-bold font-poppins tracking-tight text-slate-900 dark:text-white"
+            >
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-violet-accent to-electric-blue text-white shadow-md shadow-violet-accent/20 group-hover:scale-105 transition-transform duration-200 text-sm font-extrabold">
+                HV
+              </span>
+              <span className="bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 dark:from-white dark:via-slate-200 dark:to-slate-400 bg-clip-text text-transparent group-hover:from-violet-accent group-hover:to-electric-blue transition-all duration-300">
+                Harsh Vasoya
+              </span>
+            </a>
+          </Magnetic>
 
           {/* Desktop Navigation Links */}
           <nav className="hidden md:flex items-center gap-1 lg:gap-2">

@@ -3,6 +3,7 @@ import { Inter, Poppins } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import SmoothScrollProvider from "@/components/SmoothScrollProvider";
+import CustomCursor from "@/components/CustomCursor";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -67,6 +68,7 @@ export default function RootLayout({
     >
       <body className="bg-slate-50 dark:bg-navy text-slate-900 dark:text-slate-100 min-h-screen flex flex-col antialiased selection:bg-violet-accent selection:text-white font-sans transition-colors duration-300">
         <SmoothScrollProvider>
+          <CustomCursor />
           <Navbar />
           <div className="pt-20 flex-1 flex flex-col">
             {children}

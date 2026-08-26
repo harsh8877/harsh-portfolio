@@ -11,6 +11,7 @@ import {
   FiMapPin,
 } from "react-icons/fi";
 import { useLenis } from "@/components/SmoothScrollProvider";
+import Magnetic from "@/components/Magnetic";
 
 const TYPING_PHRASES = [
   "MERN Stack Developer",
@@ -216,30 +217,36 @@ export default function Hero() {
           className="flex flex-col sm:flex-row items-center justify-center gap-3.5 sm:gap-5 mb-10 sm:mb-12 w-full max-w-xs sm:max-w-none mx-auto"
         >
           {/* Download Resume Button */}
-          <motion.a
-            whileHover={{ scale: 1.04 }}
-            whileTap={{ scale: 0.96 }}
-            href="/resume.pdf"
-            target="_blank"
-            rel="noopener noreferrer"
-            download="Harsh_Vasoya_Resume.pdf"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 sm:px-7 py-3.5 rounded-xl bg-gradient-to-r from-violet-accent to-electric-blue text-white font-medium text-sm sm:text-base shadow-lg shadow-violet-accent/25 hover:shadow-electric-blue/30 transition-all duration-300 cursor-pointer min-h-[48px]"
-          >
-            <FiDownload className="h-4 sm:h-5 w-4 sm:w-5" />
-            <span>Download Resume</span>
-          </motion.a>
+          <Magnetic maxDistance={12} className="w-full sm:w-auto">
+            <motion.a
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.96 }}
+              href="/resume.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              download="Harsh_Vasoya_Resume.pdf"
+              data-cursor="hover"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 sm:px-7 py-3.5 rounded-xl bg-gradient-to-r from-violet-accent to-electric-blue text-white font-medium text-sm sm:text-base shadow-lg shadow-violet-accent/25 hover:shadow-electric-blue/30 transition-all duration-300 cursor-pointer min-h-[48px]"
+            >
+              <FiDownload className="h-4 sm:h-5 w-4 sm:w-5" />
+              <span>Download Resume</span>
+            </motion.a>
+          </Magnetic>
 
           {/* Contact Me Button */}
-          <motion.a
-            whileHover={{ scale: 1.04 }}
-            whileTap={{ scale: 0.96 }}
-            href="#contact"
-            onClick={scrollToContact}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 sm:px-7 py-3.5 rounded-xl border border-slate-300 dark:border-navy-border bg-white/80 dark:bg-navy-card/80 text-slate-800 dark:text-slate-200 hover:text-violet-accent dark:hover:text-electric-blue hover:border-violet-accent/40 dark:hover:border-electric-blue/40 font-medium text-sm sm:text-base backdrop-blur-md transition-all duration-300 shadow-sm cursor-pointer min-h-[48px]"
-          >
-            <span>Contact Me</span>
-            <FiArrowRight className="h-4 sm:h-5 w-4 sm:w-5 transition-transform group-hover:translate-x-1" />
-          </motion.a>
+          <Magnetic maxDistance={12} className="w-full sm:w-auto">
+            <motion.a
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.96 }}
+              href="#contact"
+              onClick={scrollToContact}
+              data-cursor="hover"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 sm:px-7 py-3.5 rounded-xl border border-slate-300 dark:border-navy-border bg-white/80 dark:bg-navy-card/80 text-slate-800 dark:text-slate-200 hover:text-violet-accent dark:hover:text-electric-blue hover:border-violet-accent/40 dark:hover:border-electric-blue/40 font-medium text-sm sm:text-base backdrop-blur-md transition-all duration-300 shadow-sm cursor-pointer min-h-[48px]"
+            >
+              <span>Contact Me</span>
+              <FiArrowRight className="h-4 sm:h-5 w-4 sm:w-5 transition-transform group-hover:translate-x-1" />
+            </motion.a>
+          </Magnetic>
         </motion.div>
 
         {/* Social Icons Row */}

@@ -220,7 +220,8 @@ export default function Projects() {
               }}
               transition={{ duration: 0.3, ease: "easeOut" }}
               onClick={() => setSelectedProject(project)}
-              className="group relative flex flex-col justify-between rounded-3xl bg-white/95 dark:bg-navy-card/95 border border-slate-200 dark:border-navy-border shadow-lg backdrop-blur-md overflow-hidden cursor-pointer transition-all duration-300"
+              data-cursor="hover"
+              className="group project-card relative flex flex-col justify-between rounded-3xl bg-white/95 dark:bg-navy-card/95 border border-slate-200 dark:border-navy-border shadow-lg backdrop-blur-md overflow-hidden cursor-pointer transition-all duration-300"
             >
               {/* Top Accent Gradient Bar */}
               <div className={`h-1.5 w-full bg-gradient-to-r ${project.gradient}`} />
