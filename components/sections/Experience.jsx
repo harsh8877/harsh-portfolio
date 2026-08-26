@@ -6,8 +6,6 @@ import {
   FiCalendar,
   FiMapPin,
   FiCheckCircle,
-  FiExternalLink,
-  FiClock,
 } from "react-icons/fi";
 
 const EXPERIENCES = [

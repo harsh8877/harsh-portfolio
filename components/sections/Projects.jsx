@@ -11,7 +11,6 @@ import {
   FiEye,
   FiFolder,
   FiStar,
-  FiCpu,
 } from "react-icons/fi";
 
 const PROJECTS_DATA = [
@@ -262,7 +261,7 @@ export default function Projects() {
                       {project.category}
                     </span>
                     <p className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 mt-2 font-mono">
-                      /* TODO: replace with real project screenshot */
+                      Interactive Preview
                     </p>
                   </div>
 

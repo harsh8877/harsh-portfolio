@@ -10,6 +10,7 @@ import {
   FiArrowRight,
   FiMapPin,
 } from "react-icons/fi";
+import { useLenis } from "@/components/SmoothScrollProvider";
 
 const TYPING_PHRASES = [
   "MERN Stack Developer",
@@ -24,28 +25,31 @@ function useTypewriter(phrases, typingSpeed = 100, deletingSpeed = 50, pauseTime
   const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
-    const currentPhrase = phrases[phraseIndex % phrases.length];
+    const currentPhrase = phrases[phraseIndex];
 
-    let timer;
-    if (isDeleting) {
-      timer = setTimeout(() => {
-        setText((prev) => prev.slice(0, -1));
-        if (text.length <= 1) {
-          setIsDeleting(false);
-          setPhraseIndex((prev) => (prev + 1) % phrases.length);
+    const timer = setTimeout(
+      () => {
+        if (!isDeleting) {
+          // Typing characters
+          setText(currentPhrase.substring(0, text.length + 1));
+
+          if (text.length + 1 === currentPhrase.length) {
+            // Finished typing word, wait before deleting
+            setTimeout(() => setIsDeleting(true), pauseTime);
+          }
+        } else {
+          // Deleting characters
+          setText(currentPhrase.substring(0, text.length - 1));
+
+          if (text.length - 1 === 0) {
+            // Finished deleting, move to next phrase
+            setIsDeleting(false);
+            setPhraseIndex((prev) => (prev + 1) % phrases.length);
+          }
         }
-      }, deletingSpeed);
-    } else {
-      if (text.length < currentPhrase.length) {
-        timer = setTimeout(() => {
-          setText(currentPhrase.slice(0, text.length + 1));
-        }, typingSpeed);
-      } else {
-        timer = setTimeout(() => {
-          setIsDeleting(true);
-        }, pauseTime);
-      }
-    }
+      },
+      isDeleting ? deletingSpeed : typingSpeed
+    );
 
     return () => clearTimeout(timer);
   }, [text, isDeleting, phraseIndex, phrases, typingSpeed, deletingSpeed, pauseTime]);
@@ -54,19 +58,26 @@ function useTypewriter(phrases, typingSpeed = 100, deletingSpeed = 50, pauseTime
 }
 
 export default function Hero() {
+  const lenis = useLenis();
   const typedRole = useTypewriter(TYPING_PHRASES);
 
   const scrollToContact = (e) => {
     e.preventDefault();
     const contactSection = document.querySelector("#contact");
     if (contactSection) {
-      const headerOffset = 80;
-      const elementPosition = contactSection.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth",
-      });
+      if (lenis) {
+        lenis.scrollTo(contactSection, { offset: -80, duration: 1.2 });
+      } else if (typeof window !== "undefined" && window.lenis) {
+        window.lenis.scrollTo(contactSection, { offset: -80, duration: 1.2 });
+      } else {
+        const headerOffset = 80;
+        const elementPosition = contactSection.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: "smooth",
+        });
+      }
     }
   };
 

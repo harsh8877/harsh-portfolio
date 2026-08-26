@@ -10,8 +10,32 @@ import {
   FiArrowRight,
   FiDownload,
 } from "react-icons/fi";
+import { useLenis } from "@/components/SmoothScrollProvider";
 
 export default function About() {
+  const lenis = useLenis();
+
+  const scrollToProjects = (e) => {
+    e.preventDefault();
+    const projectsSection = document.querySelector("#projects");
+    if (projectsSection) {
+      if (lenis) {
+        lenis.scrollTo(projectsSection, { offset: -80, duration: 1.2 });
+      } else if (typeof window !== "undefined" && window.lenis) {
+        window.lenis.scrollTo(projectsSection, { offset: -80, duration: 1.2 });
+      } else {
+        const headerOffset = 80;
+        const elementPosition = projectsSection.getBoundingClientRect().top;
+        const offsetPosition =
+          elementPosition + window.pageYOffset - headerOffset;
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: "smooth",
+        });
+      }
+    }
+  };
+
   const stats = [
     {
       icon: FiBriefcase,
@@ -104,7 +128,7 @@ export default function About() {
                       Profile Picture
                     </span>
                     <p className="text-xs text-slate-500 dark:text-slate-400 max-w-[200px]">
-                      /* TODO: replace with my profile photo */
+                      Full-Stack & MERN Developer
                     </p>
                   </div>
 
@@ -226,6 +250,7 @@ export default function About() {
             <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full sm:w-auto">
               <a
                 href="#projects"
+                onClick={scrollToProjects}
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-violet-accent to-electric-blue text-white font-medium text-sm shadow-md shadow-violet-accent/20 hover:shadow-electric-blue/30 hover:scale-105 active:scale-95 transition-all duration-200 min-h-[44px]"
               >
                 <span>View My Projects</span>

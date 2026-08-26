@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiSun, FiMoon, FiMenu, FiX } from "react-icons/fi";
+import { useLenis } from "./SmoothScrollProvider";
 
 const NAV_LINKS = [
   { name: "Home", href: "#home" },
@@ -15,6 +16,7 @@ const NAV_LINKS = [
 ];
 
 export default function Navbar() {
+  const lenis = useLenis();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(true);
@@ -23,14 +25,17 @@ export default function Navbar() {
   // Track scroll position for sticky background blur & active section
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 20) {
+      const currentScroll =
+        lenis?.scroll !== undefined ? lenis.scroll : window.scrollY;
+
+      if (currentScroll > 20) {
         setIsScrolled(true);
       } else {
         setIsScrolled(false);
       }
 
       // Update active section based on scroll position
-      const scrollPosition = window.scrollY + 120;
+      const scrollPosition = currentScroll + 120;
       for (let i = NAV_LINKS.length - 1; i >= 0; i--) {
         const link = NAV_LINKS[i];
         const section = document.querySelector(link.href);
@@ -44,10 +49,18 @@ export default function Navbar() {
       }
     };
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+    if (lenis) {
+      lenis.on("scroll", handleScroll);
+      handleScroll();
+      return () => {
+        lenis.off("scroll", handleScroll);
+      };
+    } else {
+      window.addEventListener("scroll", handleScroll, { passive: true });
+      handleScroll();
+      return () => window.removeEventListener("scroll", handleScroll);
+    }
+  }, [lenis]);
 
   // Initialize theme from localStorage or document class
   useEffect(() => {
@@ -57,12 +70,17 @@ export default function Navbar() {
       (!savedTheme && document.documentElement.classList.contains("dark")) ||
       (!savedTheme && window.matchMedia("(prefers-color-scheme: dark)").matches);
 
-    setDarkMode(isDark);
     if (isDark) {
       document.documentElement.classList.add("dark");
     } else {
       document.documentElement.classList.remove("dark");
     }
+
+    const rafId = requestAnimationFrame(() => {
+      setDarkMode(isDark);
+    });
+
+    return () => cancelAnimationFrame(rafId);
   }, []);
 
   // Toggle theme handler
@@ -78,27 +96,46 @@ export default function Navbar() {
     }
   };
 
-  // Smooth scroll handler
+  // Smooth scroll handler using Lenis
   const handleNavClick = (e, href) => {
     e.preventDefault();
     setIsMobileMenuOpen(false);
 
     if (href === "#home") {
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      if (lenis) {
+        lenis.scrollTo(0, { offset: 0, duration: 1.2 });
+      } else if (typeof window !== "undefined" && window.lenis) {
+        window.lenis.scrollTo(0, { offset: 0, duration: 1.2 });
+      } else {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
       setActiveSection("home");
       return;
     }
 
     const targetElement = document.querySelector(href);
     if (targetElement) {
-      const headerOffset = 80;
-      const elementPosition = targetElement.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+      if (lenis) {
+        lenis.scrollTo(targetElement, {
+          offset: -80,
+          duration: 1.2,
+        });
+      } else if (typeof window !== "undefined" && window.lenis) {
+        window.lenis.scrollTo(targetElement, {
+          offset: -80,
+          duration: 1.2,
+        });
+      } else {
+        const headerOffset = 80;
+        const elementPosition = targetElement.getBoundingClientRect().top;
+        const offsetPosition =
+          elementPosition + window.pageYOffset - headerOffset;
 
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth",
-      });
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: "smooth",
+        });
+      }
       setActiveSection(href.replace("#", ""));
     }
   };

@@ -7,30 +7,47 @@ import {
   FiLinkedin,
   FiMail,
   FiArrowUp,
-  FiHeart,
 } from "react-icons/fi";
+import { useLenis } from "./SmoothScrollProvider";
 
 export default function Footer() {
+  const lenis = useLenis();
   const [showBackToTop, setShowBackToTop] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 350) {
+      const currentScroll =
+        lenis?.scroll !== undefined ? lenis.scroll : window.scrollY;
+      if (currentScroll > 350) {
         setShowBackToTop(true);
       } else {
         setShowBackToTop(false);
       }
     };
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+    if (lenis) {
+      lenis.on("scroll", handleScroll);
+      handleScroll();
+      return () => {
+        lenis.off("scroll", handleScroll);
+      };
+    } else {
+      window.addEventListener("scroll", handleScroll, { passive: true });
+      return () => window.removeEventListener("scroll", handleScroll);
+    }
+  }, [lenis]);
 
   const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
+    if (lenis) {
+      lenis.scrollTo(0, { offset: 0, duration: 1.2 });
+    } else if (typeof window !== "undefined" && window.lenis) {
+      window.lenis.scrollTo(0, { offset: 0, duration: 1.2 });
+    } else {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    }
   };
 
   const navLinks = [
@@ -72,13 +89,20 @@ export default function Footer() {
     }
     const element = document.querySelector(href);
     if (element) {
-      const headerOffset = 80;
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth",
-      });
+      if (lenis) {
+        lenis.scrollTo(element, { offset: -80, duration: 1.2 });
+      } else if (typeof window !== "undefined" && window.lenis) {
+        window.lenis.scrollTo(element, { offset: -80, duration: 1.2 });
+      } else {
+        const headerOffset = 80;
+        const elementPosition = element.getBoundingClientRect().top;
+        const offsetPosition =
+          elementPosition + window.pageYOffset - headerOffset;
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: "smooth",
+        });
+      }
     }
   };
 
