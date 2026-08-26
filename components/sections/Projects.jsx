@@ -1,7 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
+import {
+  motion,
+  AnimatePresence,
+  useMotionValue,
+  useSpring,
+  useTransform,
+} from "framer-motion";
 import {
   FiExternalLink,
   FiGithub,
@@ -139,14 +145,213 @@ const containerVariants = {
   },
 };
 
-const cardVariants = {
-  hidden: { opacity: 0, y: 35 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6, ease: "easeOut" },
-  },
-};
+// 3D Tilt Project Card Component
+function ProjectTiltCard({ project, onSelect }) {
+  const cardRef = useRef(null);
+
+  // Normalized mouse coordinates relative to badge center (-0.5 to 0.5)
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  // Smooth spring physics for natural tilt and recovery (max rotation ~8deg)
+  const mouseXSpring = useSpring(x, { stiffness: 220, damping: 20 });
+  const mouseYSpring = useSpring(y, { stiffness: 220, damping: 20 });
+
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["8deg", "-8deg"]);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-8deg", "8deg"]);
+  const glareX = useTransform(mouseXSpring, [-0.5, 0.5], ["0%", "100%"]);
+  const glareY = useTransform(mouseYSpring, [-0.5, 0.5], ["0%", "100%"]);
+
+  const handleMouseMove = (e) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+
+    const xPct = mouseX / rect.width - 0.5;
+    const yPct = mouseY / rect.height - 0.5;
+
+    x.set(xPct);
+    y.set(yPct);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+
+  return (
+    <motion.div
+      ref={cardRef}
+      layoutId={`project-card-${project.id}`}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      onClick={() => onSelect(project)}
+      data-cursor="hover"
+      style={{
+        rotateX,
+        rotateY,
+        transformStyle: "preserve-3d",
+      }}
+      whileHover={{
+        y: -6,
+        boxShadow: `0 24px 45px -15px ${project.accentColor}40`,
+      }}
+      transition={{
+        type: "spring",
+        stiffness: 280,
+        damping: 26,
+      }}
+      className="group project-card relative flex flex-col justify-between rounded-3xl bg-white/95 dark:bg-navy-card/95 border border-slate-200 dark:border-navy-border shadow-lg backdrop-blur-md overflow-hidden cursor-pointer will-change-transform select-none"
+    >
+      {/* Dynamic Cursor Glare Overlay */}
+      <motion.div
+        className="pointer-events-none absolute inset-0 z-30 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        style={{
+          background: `radial-gradient(500px circle at ${glareX} ${glareY}, rgba(255,255,255,0.16), transparent 60%)`,
+        }}
+      />
+
+      {/* Top Accent Gradient Bar */}
+      <motion.div
+        layoutId={`project-gradient-${project.id}`}
+        className={`h-1.5 w-full bg-gradient-to-r ${project.gradient}`}
+      />
+
+      <div>
+        {/* Screenshot / Visual Representation Area */}
+        <div
+          className={`relative w-full aspect-[16/10] overflow-hidden bg-gradient-to-br ${project.imageBgGradient} border-b border-slate-200/80 dark:border-navy-border/60 flex flex-col justify-between p-4 sm:p-5`}
+        >
+          {/* Mockup Top Window Bar */}
+          <div className="flex items-center justify-between z-10">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-900/70 dark:bg-navy-dark/80 backdrop-blur-md border border-white/10 shadow-sm">
+              <span className="w-2.5 h-2.5 rounded-full bg-rose-500/90" />
+              <span className="w-2.5 h-2.5 rounded-full bg-amber-500/90" />
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/90" />
+              <span className="text-[10px] font-mono text-slate-300 ml-2 hidden xs:inline">
+                {project.id}.app
+              </span>
+            </div>
+
+            <motion.span
+              layoutId={`project-badge-${project.id}`}
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium bg-slate-900/80 dark:bg-navy-dark/90 text-white backdrop-blur-md border border-white/10 shadow-md"
+            >
+              <FiStar className="w-3 h-3 text-amber-400" />
+              <span className="hidden sm:inline">{project.featuredBadge}</span>
+              <span className="sm:hidden">{project.category}</span>
+            </motion.span>
+          </div>
+
+          {/* Mockup Visual Center Representation */}
+          <div
+            className="relative my-auto flex flex-col items-center justify-center text-center p-2"
+            style={{ transform: "translateZ(20px)" }}
+          >
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white/80 dark:bg-navy-dark/85 backdrop-blur-md p-3.5 shadow-xl border border-slate-200/60 dark:border-navy-border/80 flex items-center justify-center mb-2.5 group-hover:scale-110 transition-transform duration-300">
+              <FiFolder
+                className="w-7 h-7 sm:w-8 sm:h-8 transition-colors duration-300"
+                style={{ color: project.accentColor }}
+              />
+            </div>
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 bg-white/80 dark:bg-navy-light/90 px-3.5 py-1 rounded-full border border-slate-200/70 dark:border-navy-border/70 backdrop-blur-sm shadow-sm">
+              {project.category}
+            </span>
+            <p className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 mt-2 font-mono">
+              Interactive Preview
+            </p>
+          </div>
+
+          {/* Mockup Bottom Status Bar */}
+          <div className="flex items-center justify-between text-[10px] text-slate-400 dark:text-slate-500 font-mono z-10">
+            <span className="truncate max-w-[180px] sm:max-w-xs">{project.title}</span>
+            <span className="text-emerald-500 font-medium">● Live App</span>
+          </div>
+
+          {/* Clean Frosted Hover Overlay */}
+          <div className="absolute inset-0 bg-slate-950/75 dark:bg-navy-dark/85 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col items-center justify-center p-4 z-20">
+            <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-white dark:bg-navy text-slate-900 dark:text-white text-xs sm:text-sm font-semibold shadow-2xl border border-violet-accent/40 dark:border-electric-blue/40 transform scale-95 group-hover:scale-100 transition-all duration-300">
+              <FiEye className="w-4 h-4 text-violet-accent dark:text-electric-blue animate-pulse" />
+              <span>Click to View Details</span>
+            </div>
+            <p className="text-[11px] text-slate-300 dark:text-slate-400 mt-2 font-medium">
+              Architecture • Tech Stack • Case Study
+            </p>
+          </div>
+        </div>
+
+        {/* Card Content Area */}
+        <div className="p-6 sm:p-7" style={{ transform: "translateZ(15px)" }}>
+          {/* Title */}
+          <div className="flex items-start justify-between gap-4 mb-2.5">
+            <motion.h3
+              layoutId={`project-title-${project.id}`}
+              className="text-xl sm:text-2xl font-bold font-poppins text-slate-900 dark:text-white group-hover:text-violet-accent dark:group-hover:text-electric-blue transition-colors"
+            >
+              {project.title}
+            </motion.h3>
+          </div>
+
+          {/* Short Description */}
+          <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-5 line-clamp-2">
+            {project.shortDesc}
+          </p>
+
+          {/* Tech Stack Pills */}
+          <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-2">
+            {project.techStack.map((tech) => (
+              <span
+                key={tech}
+                className="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-navy-light text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-navy-border/60"
+              >
+                {tech}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Card Footer Actions */}
+      <div className="px-6 sm:px-7 pb-5 pt-3 border-t border-slate-100 dark:border-navy-border/40 flex items-center justify-between">
+        <button
+          type="button"
+          onClick={() => onSelect(project)}
+          data-cursor="hover"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-violet-accent dark:text-electric-blue hover:underline cursor-pointer"
+        >
+          <FiEye className="w-4 h-4" />
+          <span>Explore Details</span>
+        </button>
+
+        <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+          <a
+            href={project.githubUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="GitHub Repository"
+            title="View GitHub Repository"
+            data-cursor="hover"
+            className="p-2.5 rounded-xl bg-slate-100 dark:bg-navy-light text-slate-600 dark:text-slate-300 hover:text-violet-accent dark:hover:text-electric-blue hover:bg-slate-200 dark:hover:bg-navy-border transition-colors cursor-pointer"
+          >
+            <FiGithub className="w-4 h-4" />
+          </a>
+          <a
+            href={project.demoUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Live Demo"
+            title="View Live Demo"
+            data-cursor="hover"
+            className="p-2.5 rounded-xl bg-slate-100 dark:bg-navy-light text-slate-600 dark:text-slate-300 hover:text-violet-accent dark:hover:text-electric-blue hover:bg-slate-200 dark:hover:bg-navy-border transition-colors cursor-pointer"
+          >
+            <FiExternalLink className="w-4 h-4" />
+          </a>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
 
 export default function Projects() {
   const [selectedProject, setSelectedProject] = useState(null);
@@ -195,163 +400,36 @@ export default function Projects() {
             Featured Portfolio Work
           </div>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold font-poppins tracking-tight text-slate-900 dark:text-white mb-4">
-            Highlighted <span className="bg-gradient-to-r from-violet-accent to-electric-blue bg-clip-text text-transparent">Projects</span>
+            Highlighted{" "}
+            <span className="bg-gradient-to-r from-violet-accent to-electric-blue bg-clip-text text-transparent">
+              Projects
+            </span>
           </h2>
           <p className="text-slate-600 dark:text-slate-400 text-base sm:text-lg">
             Real-world web applications showcasing frontend precision, full-stack architecture, and clean problem solving.
           </p>
         </motion.div>
 
-        {/* Projects Grid: 1 col mobile, 2 col tablet/desktop */}
+        {/* Projects Grid with 3D perspective */}
         <motion.div
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.1 }}
+          style={{ perspective: 1000 }}
           className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10"
         >
           {PROJECTS_DATA.map((project) => (
-            <motion.div
+            <ProjectTiltCard
               key={project.id}
-              variants={cardVariants}
-              whileHover={{
-                y: -6,
-                boxShadow: `0 20px 40px -15px ${project.accentColor}35`,
-              }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
-              onClick={() => setSelectedProject(project)}
-              data-cursor="hover"
-              className="group project-card relative flex flex-col justify-between rounded-3xl bg-white/95 dark:bg-navy-card/95 border border-slate-200 dark:border-navy-border shadow-lg backdrop-blur-md overflow-hidden cursor-pointer transition-all duration-300"
-            >
-              {/* Top Accent Gradient Bar */}
-              <div className={`h-1.5 w-full bg-gradient-to-r ${project.gradient}`} />
-
-              <div>
-                {/* Screenshot Placeholder Area */}
-                {/* TODO: replace with real project screenshot */}
-                <div
-                  className={`relative w-full aspect-[16/10] overflow-hidden bg-gradient-to-br ${project.imageBgGradient} border-b border-slate-200/80 dark:border-navy-border/60 flex flex-col justify-between p-4 sm:p-5`}
-                >
-                  {/* Mockup Top Window Bar */}
-                  <div className="flex items-center justify-between z-10">
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-900/70 dark:bg-navy-dark/80 backdrop-blur-md border border-white/10 shadow-sm">
-                      <span className="w-2.5 h-2.5 rounded-full bg-rose-500/90" />
-                      <span className="w-2.5 h-2.5 rounded-full bg-amber-500/90" />
-                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/90" />
-                      <span className="text-[10px] font-mono text-slate-300 ml-2 hidden xs:inline">
-                        {project.id}.app
-                      </span>
-                    </div>
-
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium bg-slate-900/80 dark:bg-navy-dark/90 text-white backdrop-blur-md border border-white/10 shadow-md">
-                      <FiStar className="w-3 h-3 text-amber-400" />
-                      <span className="hidden sm:inline">{project.featuredBadge}</span>
-                      <span className="sm:hidden">{project.category}</span>
-                    </span>
-                  </div>
-
-                  {/* Mockup Visual Center Representation */}
-                  <div className="relative my-auto flex flex-col items-center justify-center text-center p-2">
-                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white/80 dark:bg-navy-dark/85 backdrop-blur-md p-3.5 shadow-xl border border-slate-200/60 dark:border-navy-border/80 flex items-center justify-center mb-2.5 group-hover:scale-110 transition-transform duration-300">
-                      <FiFolder
-                        className="w-7 h-7 sm:w-8 sm:h-8 transition-colors duration-300"
-                        style={{ color: project.accentColor }}
-                      />
-                    </div>
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 bg-white/80 dark:bg-navy-light/90 px-3.5 py-1 rounded-full border border-slate-200/70 dark:border-navy-border/70 backdrop-blur-sm shadow-sm">
-                      {project.category}
-                    </span>
-                    <p className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 mt-2 font-mono">
-                      Interactive Preview
-                    </p>
-                  </div>
-
-                  {/* Mockup Bottom Status Bar */}
-                  <div className="flex items-center justify-between text-[10px] text-slate-400 dark:text-slate-500 font-mono z-10">
-                    <span className="truncate max-w-[180px] sm:max-w-xs">{project.title}</span>
-                    <span className="text-emerald-500 font-medium">● Live App</span>
-                  </div>
-
-                  {/* Clean Frosted Hover Overlay (No overlapping text) */}
-                  <div className="absolute inset-0 bg-slate-950/75 dark:bg-navy-dark/85 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col items-center justify-center p-4 z-20">
-                    <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-white dark:bg-navy text-slate-900 dark:text-white text-xs sm:text-sm font-semibold shadow-2xl border border-violet-accent/40 dark:border-electric-blue/40 transform scale-95 group-hover:scale-100 transition-all duration-300">
-                      <FiEye className="w-4 h-4 text-violet-accent dark:text-electric-blue animate-pulse" />
-                      <span>Click to View Details</span>
-                    </div>
-                    <p className="text-[11px] text-slate-300 dark:text-slate-400 mt-2 font-medium">
-                      Architecture • Tech Stack • Case Study
-                    </p>
-                  </div>
-                </div>
-
-                {/* Card Content Area */}
-                <div className="p-6 sm:p-7">
-                  {/* Title */}
-                  <div className="flex items-start justify-between gap-4 mb-2.5">
-                    <h3 className="text-xl sm:text-2xl font-bold font-poppins text-slate-900 dark:text-white group-hover:text-violet-accent dark:group-hover:text-electric-blue transition-colors">
-                      {project.title}
-                    </h3>
-                  </div>
-
-                  {/* Short Description */}
-                  <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-5 line-clamp-2">
-                    {project.shortDesc}
-                  </p>
-
-                  {/* Tech Stack Pills */}
-                  <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-2">
-                    {project.techStack.map((tech) => (
-                      <span
-                        key={tech}
-                        className="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-navy-light text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-navy-border/60"
-                      >
-                        {tech}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Card Footer Actions */}
-              <div className="px-6 sm:px-7 pb-5 pt-3 border-t border-slate-100 dark:border-navy-border/40 flex items-center justify-between">
-                <button
-                  type="button"
-                  onClick={() => setSelectedProject(project)}
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-violet-accent dark:text-electric-blue hover:underline cursor-pointer"
-                >
-                  <FiEye className="w-4 h-4" />
-                  <span>Explore Details</span>
-                </button>
-
-                <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-                  <a
-                    href={project.githubUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="GitHub Repository"
-                    title="View GitHub Repository"
-                    className="p-2.5 rounded-xl bg-slate-100 dark:bg-navy-light text-slate-600 dark:text-slate-300 hover:text-violet-accent dark:hover:text-electric-blue hover:bg-slate-200 dark:hover:bg-navy-border transition-colors cursor-pointer"
-                  >
-                    <FiGithub className="w-4 h-4" />
-                  </a>
-                  <a
-                    href={project.demoUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="Live Demo"
-                    title="View Live Demo"
-                    className="p-2.5 rounded-xl bg-slate-100 dark:bg-navy-light text-slate-600 dark:text-slate-300 hover:text-violet-accent dark:hover:text-electric-blue hover:bg-slate-200 dark:hover:bg-navy-border transition-colors cursor-pointer"
-                  >
-                    <FiExternalLink className="w-4 h-4" />
-                  </a>
-                </div>
-              </div>
-            </motion.div>
+              project={project}
+              onSelect={setSelectedProject}
+            />
           ))}
         </motion.div>
       </div>
 
-      {/* Animated Modal Dialog for Full Project Details */}
+      {/* Animated Modal Dialog for Full Project Details with shared layoutId */}
       <AnimatePresence>
         {selectedProject && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
@@ -362,31 +440,39 @@ export default function Projects() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.25 }}
               onClick={() => setSelectedProject(null)}
-              className="fixed inset-0 bg-black/75 backdrop-blur-md"
+              className="fixed inset-0 bg-black/80 backdrop-blur-md"
             />
 
-            {/* Modal Content Box */}
+            {/* Modal Content Box with matching layoutId for fluid morphing */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 25 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 25 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="relative w-full max-w-2xl max-h-[85vh] sm:max-h-[90vh] bg-white dark:bg-navy-card rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-navy-border shadow-2xl overflow-y-auto z-10 my-auto p-5 sm:p-8"
+              layoutId={`project-card-${selectedProject.id}`}
+              transition={{ type: "spring", damping: 28, stiffness: 260 }}
+              className="relative w-full max-w-2xl max-h-[85vh] sm:max-h-[90vh] bg-white dark:bg-navy-card rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-navy-border shadow-2xl overflow-y-auto z-50 my-auto p-5 sm:p-8"
             >
+              {/* Top Accent Gradient Bar in Modal */}
+              <motion.div
+                layoutId={`project-gradient-${selectedProject.id}`}
+                className={`absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r ${selectedProject.gradient}`}
+              />
+
               {/* Close Button */}
               <button
                 onClick={() => setSelectedProject(null)}
                 aria-label="Close project modal"
+                data-cursor="hover"
                 className="absolute top-4 right-4 sm:top-5 sm:right-5 p-2.5 rounded-full bg-slate-100 dark:bg-navy-light text-slate-600 dark:text-slate-300 hover:text-violet-accent dark:hover:text-electric-blue hover:bg-slate-200 dark:hover:bg-navy-border transition-colors cursor-pointer z-20 min-w-[40px] min-h-[40px] flex items-center justify-center"
               >
                 <FiX className="w-5 h-5" />
               </button>
 
               {/* Category & Badge */}
-              <div className="flex flex-wrap items-center gap-2 mb-3 pr-8">
-                <span className="text-xs font-semibold uppercase tracking-wider text-violet-accent dark:text-electric-blue bg-violet-accent/10 dark:bg-electric-blue/10 px-3 py-1 rounded-full border border-violet-accent/20 dark:border-electric-blue/20">
+              <div className="flex flex-wrap items-center gap-2 mb-3 pr-8 pt-2">
+                <motion.span
+                  layoutId={`project-badge-${selectedProject.id}`}
+                  className="text-xs font-semibold uppercase tracking-wider text-violet-accent dark:text-electric-blue bg-violet-accent/10 dark:bg-electric-blue/10 px-3 py-1 rounded-full border border-violet-accent/20 dark:border-electric-blue/20"
+                >
                   {selectedProject.category}
-                </span>
+                </motion.span>
                 <span className="text-xs text-slate-400">•</span>
                 <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
                   {selectedProject.featuredBadge}
@@ -394,9 +480,12 @@ export default function Projects() {
               </div>
 
               {/* Title */}
-              <h3 className="text-xl sm:text-3xl font-extrabold font-poppins text-slate-900 dark:text-white mb-4 pr-6 leading-tight">
+              <motion.h3
+                layoutId={`project-title-${selectedProject.id}`}
+                className="text-xl sm:text-3xl font-extrabold font-poppins text-slate-900 dark:text-white mb-4 pr-6 leading-tight"
+              >
                 {selectedProject.title}
-              </h3>
+              </motion.h3>
 
               {/* Full Overview Paragraph */}
               <p className="text-xs sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed mb-6">
@@ -444,6 +533,7 @@ export default function Projects() {
                   href={selectedProject.githubUrl}
                   target="_blank"
                   rel="noopener noreferrer"
+                  data-cursor="hover"
                   className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl border border-slate-300 dark:border-navy-border bg-white dark:bg-navy-card text-slate-700 dark:text-slate-200 hover:text-violet-accent dark:hover:text-electric-blue font-medium text-xs sm:text-sm transition-colors cursor-pointer min-h-[44px]"
                 >
                   <FiGithub className="w-4 h-4" />
@@ -454,6 +544,7 @@ export default function Projects() {
                   href={selectedProject.demoUrl}
                   target="_blank"
                   rel="noopener noreferrer"
+                  data-cursor="hover"
                   className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-violet-accent to-electric-blue text-white font-medium text-xs sm:text-sm shadow-md shadow-violet-accent/25 hover:shadow-electric-blue/30 transition-all cursor-pointer min-h-[44px]"
                 >
                   <span>Live Preview</span>
