@@ -216,14 +216,12 @@ export default function Projects() {
               key={project.id}
               variants={cardVariants}
               whileHover={{
-                y: -8,
-                rotateX: 1.5,
-                rotateY: -1.5,
-                boxShadow: `0 25px 45px -12px ${project.accentColor}25`,
+                y: -6,
+                boxShadow: `0 20px 40px -15px ${project.accentColor}35`,
               }}
-              transition={{ type: "spring", stiffness: 280, damping: 20 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
               onClick={() => setSelectedProject(project)}
-              className="group relative flex flex-col justify-between rounded-3xl bg-white/90 dark:bg-navy-card/90 border border-slate-200 dark:border-navy-border shadow-lg backdrop-blur-md overflow-hidden cursor-pointer transition-all duration-300"
+              className="group relative flex flex-col justify-between rounded-3xl bg-white/95 dark:bg-navy-card/95 border border-slate-200 dark:border-navy-border shadow-lg backdrop-blur-md overflow-hidden cursor-pointer transition-all duration-300"
             >
               {/* Top Accent Gradient Bar */}
               <div className={`h-1.5 w-full bg-gradient-to-r ${project.gradient}`} />
@@ -232,54 +230,76 @@ export default function Projects() {
                 {/* Screenshot Placeholder Area */}
                 {/* TODO: replace with real project screenshot */}
                 <div
-                  className={`relative w-full aspect-[16/9] overflow-hidden bg-gradient-to-br ${project.imageBgGradient} flex flex-col items-center justify-center p-6 border-b border-slate-200/80 dark:border-navy-border/60 group-hover:scale-[1.01] transition-transform duration-500`}
+                  className={`relative w-full aspect-[16/10] overflow-hidden bg-gradient-to-br ${project.imageBgGradient} border-b border-slate-200/80 dark:border-navy-border/60 flex flex-col justify-between p-4 sm:p-5`}
                 >
-                  {/* Decorative Project Icon Frame */}
-                  <div className="relative z-10 flex flex-col items-center text-center">
-                    <div className="w-16 h-16 rounded-2xl bg-white/80 dark:bg-navy-dark/80 backdrop-blur-md p-3.5 shadow-xl border border-slate-200/60 dark:border-navy-border/80 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-                      <FiFolder className="w-8 h-8 text-violet-accent dark:text-electric-blue" />
+                  {/* Mockup Top Window Bar */}
+                  <div className="flex items-center justify-between z-10">
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-900/70 dark:bg-navy-dark/80 backdrop-blur-md border border-white/10 shadow-sm">
+                      <span className="w-2.5 h-2.5 rounded-full bg-rose-500/90" />
+                      <span className="w-2.5 h-2.5 rounded-full bg-amber-500/90" />
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/90" />
+                      <span className="text-[10px] font-mono text-slate-300 ml-2 hidden xs:inline">
+                        {project.id}.app
+                      </span>
                     </div>
-                    <span className="text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-200 bg-white/70 dark:bg-navy-light/80 px-3 py-1 rounded-full border border-slate-200/60 dark:border-navy-border/60 backdrop-blur-sm">
+
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium bg-slate-900/80 dark:bg-navy-dark/90 text-white backdrop-blur-md border border-white/10 shadow-md">
+                      <FiStar className="w-3 h-3 text-amber-400" />
+                      <span className="hidden sm:inline">{project.featuredBadge}</span>
+                      <span className="sm:hidden">{project.category}</span>
+                    </span>
+                  </div>
+
+                  {/* Mockup Visual Center Representation */}
+                  <div className="relative my-auto flex flex-col items-center justify-center text-center p-2">
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white/80 dark:bg-navy-dark/85 backdrop-blur-md p-3.5 shadow-xl border border-slate-200/60 dark:border-navy-border/80 flex items-center justify-center mb-2.5 group-hover:scale-110 transition-transform duration-300">
+                      <FiFolder
+                        className="w-7 h-7 sm:w-8 sm:h-8 transition-colors duration-300"
+                        style={{ color: project.accentColor }}
+                      />
+                    </div>
+                    <span className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 bg-white/80 dark:bg-navy-light/90 px-3.5 py-1 rounded-full border border-slate-200/70 dark:border-navy-border/70 backdrop-blur-sm shadow-sm">
                       {project.category}
                     </span>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2 font-mono">
+                    <p className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 mt-2 font-mono">
                       /* TODO: replace with real project screenshot */
                     </p>
                   </div>
 
-                  {/* Top Badge: Featured */}
-                  <div className="absolute top-4 left-4 z-10">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-slate-900/80 dark:bg-navy-dark/90 text-white backdrop-blur-md border border-white/10 shadow-md">
-                      <FiStar className="w-3.5 h-3.5 text-amber-400" />
-                      {project.featuredBadge}
-                    </span>
+                  {/* Mockup Bottom Status Bar */}
+                  <div className="flex items-center justify-between text-[10px] text-slate-400 dark:text-slate-500 font-mono z-10">
+                    <span className="truncate max-w-[180px] sm:max-w-xs">{project.title}</span>
+                    <span className="text-emerald-500 font-medium">● Live App</span>
                   </div>
 
-                  {/* Hover Overlay Hint */}
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-xs">
-                    <span className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white dark:bg-navy text-slate-900 dark:text-white text-xs font-semibold shadow-xl">
-                      <FiEye className="w-4 h-4 text-violet-accent dark:text-electric-blue" />
-                      Click to View Details
-                    </span>
+                  {/* Clean Frosted Hover Overlay (No overlapping text) */}
+                  <div className="absolute inset-0 bg-slate-950/75 dark:bg-navy-dark/85 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col items-center justify-center p-4 z-20">
+                    <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-white dark:bg-navy text-slate-900 dark:text-white text-xs sm:text-sm font-semibold shadow-2xl border border-violet-accent/40 dark:border-electric-blue/40 transform scale-95 group-hover:scale-100 transition-all duration-300">
+                      <FiEye className="w-4 h-4 text-violet-accent dark:text-electric-blue animate-pulse" />
+                      <span>Click to View Details</span>
+                    </div>
+                    <p className="text-[11px] text-slate-300 dark:text-slate-400 mt-2 font-medium">
+                      Architecture • Tech Stack • Case Study
+                    </p>
                   </div>
                 </div>
 
                 {/* Card Content Area */}
-                <div className="p-6 sm:p-8">
+                <div className="p-6 sm:p-7">
                   {/* Title */}
-                  <div className="flex items-start justify-between gap-4 mb-3">
+                  <div className="flex items-start justify-between gap-4 mb-2.5">
                     <h3 className="text-xl sm:text-2xl font-bold font-poppins text-slate-900 dark:text-white group-hover:text-violet-accent dark:group-hover:text-electric-blue transition-colors">
                       {project.title}
                     </h3>
                   </div>
 
                   {/* Short Description */}
-                  <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-6">
+                  <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-5 line-clamp-2">
                     {project.shortDesc}
                   </p>
 
                   {/* Tech Stack Pills */}
-                  <div className="flex flex-wrap gap-2 mb-6">
+                  <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-2">
                     {project.techStack.map((tech) => (
                       <span
                         key={tech}
@@ -293,13 +313,14 @@ export default function Projects() {
               </div>
 
               {/* Card Footer Actions */}
-              <div className="px-6 sm:px-8 pb-6 pt-2 border-t border-slate-100 dark:border-navy-border/40 flex items-center justify-between">
+              <div className="px-6 sm:px-7 pb-5 pt-3 border-t border-slate-100 dark:border-navy-border/40 flex items-center justify-between">
                 <button
                   type="button"
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-violet-accent dark:text-electric-blue group-hover:underline cursor-pointer"
+                  onClick={() => setSelectedProject(project)}
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-violet-accent dark:text-electric-blue hover:underline cursor-pointer"
                 >
                   <FiEye className="w-4 h-4" />
-                  <span>Explore Case Study</span>
+                  <span>Explore Details</span>
                 </button>
 
                 <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
@@ -308,7 +329,8 @@ export default function Projects() {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="GitHub Repository"
-                    className="p-2 rounded-lg bg-slate-100 dark:bg-navy-light text-slate-600 dark:text-slate-300 hover:text-violet-accent dark:hover:text-electric-blue hover:bg-slate-200 dark:hover:bg-navy-border transition-colors cursor-pointer"
+                    title="View GitHub Repository"
+                    className="p-2.5 rounded-xl bg-slate-100 dark:bg-navy-light text-slate-600 dark:text-slate-300 hover:text-violet-accent dark:hover:text-electric-blue hover:bg-slate-200 dark:hover:bg-navy-border transition-colors cursor-pointer"
                   >
                     <FiGithub className="w-4 h-4" />
                   </a>
@@ -317,7 +339,8 @@ export default function Projects() {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="Live Demo"
-                    className="p-2 rounded-lg bg-slate-100 dark:bg-navy-light text-slate-600 dark:text-slate-300 hover:text-violet-accent dark:hover:text-electric-blue hover:bg-slate-200 dark:hover:bg-navy-border transition-colors cursor-pointer"
+                    title="View Live Demo"
+                    className="p-2.5 rounded-xl bg-slate-100 dark:bg-navy-light text-slate-600 dark:text-slate-300 hover:text-violet-accent dark:hover:text-electric-blue hover:bg-slate-200 dark:hover:bg-navy-border transition-colors cursor-pointer"
                   >
                     <FiExternalLink className="w-4 h-4" />
                   </a>

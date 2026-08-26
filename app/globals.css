@@ -11,6 +11,7 @@
   --color-electric-blue: #00d4ff;
   --color-violet-accent: #6c5ce7;
 
+  --font-sans: var(--font-inter), sans-serif;
   --font-inter: var(--font-inter), sans-serif;
   --font-poppins: var(--font-poppins), sans-serif;
 }

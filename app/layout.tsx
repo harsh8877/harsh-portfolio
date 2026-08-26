@@ -17,8 +17,41 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Harsh Vasoya | MERN Stack Developer Portfolio",
-  description: "Personal portfolio website of Harsh Vasoya - MERN Stack Developer specializing in React.js, Next.js, and modern full-stack web applications.",
+  title: "Harsh Vasoya - MERN Stack Developer Portfolio",
+  description:
+    "Personal portfolio website of Harsh Vasoya - MERN Stack Developer specializing in React.js, Next.js, and modern full-stack web applications.",
+  keywords: [
+    "Harsh Vasoya",
+    "MERN Stack Developer",
+    "React.js Developer",
+    "Next.js Developer",
+    "Frontend Engineer",
+    "Full-Stack Developer",
+    "JavaScript",
+    "TypeScript",
+    "Tailwind CSS",
+    "Surat",
+    "Portfolio",
+  ],
+  authors: [{ name: "Harsh Vasoya", url: "https://github.com/harsh8877" }],
+  creator: "Harsh Vasoya",
+  icons: {
+    icon: "/favicon.ico",
+  },
+  openGraph: {
+    title: "Harsh Vasoya - MERN Stack Developer Portfolio",
+    description:
+      "Passionate MERN Stack Developer crafting dynamic, responsive, and scalable web applications.",
+    type: "website",
+    locale: "en_US",
+    siteName: "Harsh Vasoya Portfolio",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Harsh Vasoya - MERN Stack Developer Portfolio",
+    description:
+      "Passionate MERN Stack Developer crafting dynamic, responsive, and scalable web applications.",
+  },
 };
 
 export default function RootLayout({
