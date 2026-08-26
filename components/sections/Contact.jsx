@@ -8,7 +8,6 @@ import {
   FiLinkedin,
   FiGithub,
   FiSend,
-  FiCheckCircle,
   FiUser,
   FiMessageSquare,
   FiAlertCircle,
@@ -25,6 +24,7 @@ export default function Contact() {
     message: "",
   });
 
+  const [focusedField, setFocusedField] = useState(null);
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -59,7 +59,6 @@ export default function Contact() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    // Clear error when user types
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
@@ -121,7 +120,7 @@ export default function Contact() {
       id="contact"
       className="relative py-20 md:py-28 px-4 sm:px-6 lg:px-8 overflow-hidden"
     >
-      {/* Background Animated Blobs and Grid Pattern (Consistent with Hero) */}
+      {/* Background Animated Blobs and Grid Pattern */}
       <div className="absolute inset-0 -z-10 pointer-events-none">
         <motion.div
           animate={{
@@ -208,6 +207,7 @@ export default function Contact() {
                       viewport={{ once: true }}
                       transition={{ delay: idx * 0.08 }}
                       whileHover={{ x: 4 }}
+                      data-cursor="hover"
                       className="group flex items-center justify-between p-3.5 rounded-2xl bg-slate-50 dark:bg-navy-dark/60 border border-slate-200/80 dark:border-navy-border/60 hover:border-violet-accent/40 dark:hover:border-electric-blue/40 transition-all duration-200 shadow-sm"
                     >
                       <a
@@ -235,6 +235,7 @@ export default function Contact() {
                         <button
                           type="button"
                           onClick={handleCopyEmail}
+                          data-cursor="hover"
                           title="Copy Email"
                           aria-label="Copy Email"
                           className="p-2 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-navy-light transition-colors ml-2 cursor-pointer"
@@ -276,16 +277,52 @@ export default function Contact() {
             <div className="p-5 sm:p-10 rounded-3xl bg-white/90 dark:bg-navy-card/90 border border-slate-200 dark:border-navy-border shadow-xl backdrop-blur-md">
               <AnimatePresence mode="wait">
                 {isSuccess ? (
-                  /* Animated Success State */
+                  /* Animated Success State with Spring & SVG Path Checkmark */
                   <motion.div
-                    key="success"
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
+                    key="success-message"
+                    initial={{ opacity: 0, scale: 0.85, y: 25 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.85, y: -20 }}
+                    transition={{
+                      type: "spring",
+                      damping: 20,
+                      stiffness: 260,
+                    }}
                     className="py-12 flex flex-col items-center justify-center text-center space-y-4"
                   >
-                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-emerald-500/10 border-2 border-emerald-500/30 flex items-center justify-center text-emerald-500 shadow-lg shadow-emerald-500/20">
-                      <FiCheckCircle className="w-8 h-8 sm:w-10 sm:h-10 animate-bounce" />
+                    {/* Animated SVG Checkmark drawing itself */}
+                    <div className="w-20 h-20 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shadow-xl shadow-emerald-500/20 mb-2">
+                      <svg
+                        className="w-12 h-12 text-emerald-500"
+                        viewBox="0 0 52 52"
+                        fill="none"
+                      >
+                        <motion.circle
+                          cx="26"
+                          cy="26"
+                          r="23"
+                          stroke="currentColor"
+                          strokeWidth="3"
+                          strokeLinecap="round"
+                          initial={{ pathLength: 0, opacity: 0 }}
+                          animate={{ pathLength: 1, opacity: 1 }}
+                          transition={{ duration: 0.5, ease: "easeOut" }}
+                        />
+                        <motion.path
+                          d="M15 27l8 8 16-16"
+                          stroke="currentColor"
+                          strokeWidth="3.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          initial={{ pathLength: 0 }}
+                          animate={{ pathLength: 1 }}
+                          transition={{
+                            duration: 0.45,
+                            delay: 0.35,
+                            ease: "easeOut",
+                          }}
+                        />
+                      </svg>
                     </div>
 
                     <h3 className="text-2xl sm:text-3xl font-extrabold font-poppins text-slate-900 dark:text-white">
@@ -293,44 +330,70 @@ export default function Contact() {
                     </h3>
 
                     <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 max-w-md mx-auto leading-relaxed">
-                      Thank you for reaching out, Harsh will review your message and reply as soon as possible.
+                      Thank you for reaching out! Harsh will review your message and reply as soon as possible.
                     </p>
 
                     <button
                       type="button"
                       onClick={() => setIsSuccess(false)}
-                      className="mt-4 px-6 py-2.5 rounded-xl bg-gradient-to-r from-violet-accent to-electric-blue text-white font-medium text-xs sm:text-sm shadow-md hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                      data-cursor="hover"
+                      className="mt-4 px-6 py-3 rounded-xl bg-gradient-to-r from-violet-accent to-electric-blue text-white font-medium text-xs sm:text-sm shadow-md hover:scale-105 active:scale-95 transition-all cursor-pointer"
                     >
                       Send Another Message
                     </button>
                   </motion.div>
                 ) : (
-                  /* Contact Form */
-                  <form key="form" onSubmit={handleSubmit} noValidate className="space-y-5">
+                  /* Contact Form with Animated Floating Labels */
+                  <motion.form
+                    key="contact-form"
+                    onSubmit={handleSubmit}
+                    noValidate
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0, scale: 0.95, y: -20 }}
+                    transition={{ duration: 0.3 }}
+                    className="space-y-6"
+                  >
                     <h3 className="text-xl sm:text-2xl font-bold font-poppins text-slate-900 dark:text-white mb-2">
                       Send a Message
                     </h3>
 
-                    {/* Name Field */}
-                    <div>
-                      <label
-                        htmlFor="name"
-                        className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2"
-                      >
-                        Your Name <span className="text-rose-500">*</span>
-                      </label>
+                    {/* Name Floating Field */}
+                    <div className="relative pt-3">
                       <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                           <FiUser className="w-4 h-4" />
                         </div>
+
+                        {/* Floating Label */}
+                        <motion.label
+                          htmlFor="name"
+                          initial={false}
+                          animate={{
+                            y: focusedField === "name" || formData.name ? -24 : 12,
+                            scale: focusedField === "name" || formData.name ? 0.85 : 1,
+                            color:
+                              focusedField === "name"
+                                ? "#6c5ce7"
+                                : "#94a3b8",
+                          }}
+                          transition={{ duration: 0.2, ease: "easeOut" }}
+                          className="absolute left-10 pointer-events-none origin-left font-semibold text-xs uppercase tracking-wider z-10"
+                        >
+                          Your Name <span className="text-rose-500">*</span>
+                        </motion.label>
+
                         <input
                           id="name"
                           type="text"
                           name="name"
                           value={formData.name}
+                          onFocus={() => setFocusedField("name")}
+                          onBlur={() => setFocusedField(null)}
                           onChange={handleChange}
-                          placeholder="e.g. John Doe"
-                          className={`w-full pl-10 pr-4 py-3 rounded-xl bg-slate-50 dark:bg-navy-dark/70 border ${
+                          data-cursor="hover"
+                          placeholder={focusedField === "name" ? "e.g. John Doe" : ""}
+                          className={`w-full pl-10 pr-4 py-3.5 rounded-xl bg-slate-50 dark:bg-navy-dark/70 border ${
                             errors.name
                               ? "border-rose-500 focus:ring-rose-500/20"
                               : "border-slate-200 dark:border-navy-border focus:border-violet-accent dark:focus:border-electric-blue"
@@ -352,26 +415,42 @@ export default function Contact() {
                       </AnimatePresence>
                     </div>
 
-                    {/* Email Field */}
-                    <div>
-                      <label
-                        htmlFor="email"
-                        className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2"
-                      >
-                        Email Address <span className="text-rose-500">*</span>
-                      </label>
+                    {/* Email Floating Field */}
+                    <div className="relative pt-3">
                       <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                           <FiMail className="w-4 h-4" />
                         </div>
+
+                        {/* Floating Label */}
+                        <motion.label
+                          htmlFor="email"
+                          initial={false}
+                          animate={{
+                            y: focusedField === "email" || formData.email ? -24 : 12,
+                            scale: focusedField === "email" || formData.email ? 0.85 : 1,
+                            color:
+                              focusedField === "email"
+                                ? "#6c5ce7"
+                                : "#94a3b8",
+                          }}
+                          transition={{ duration: 0.2, ease: "easeOut" }}
+                          className="absolute left-10 pointer-events-none origin-left font-semibold text-xs uppercase tracking-wider z-10"
+                        >
+                          Email Address <span className="text-rose-500">*</span>
+                        </motion.label>
+
                         <input
                           id="email"
                           type="email"
                           name="email"
                           value={formData.email}
+                          onFocus={() => setFocusedField("email")}
+                          onBlur={() => setFocusedField(null)}
                           onChange={handleChange}
-                          placeholder="e.g. john@example.com"
-                          className={`w-full pl-10 pr-4 py-3 rounded-xl bg-slate-50 dark:bg-navy-dark/70 border ${
+                          data-cursor="hover"
+                          placeholder={focusedField === "email" ? "e.g. john@example.com" : ""}
+                          className={`w-full pl-10 pr-4 py-3.5 rounded-xl bg-slate-50 dark:bg-navy-dark/70 border ${
                             errors.email
                               ? "border-rose-500 focus:ring-rose-500/20"
                               : "border-slate-200 dark:border-navy-border focus:border-violet-accent dark:focus:border-electric-blue"
@@ -393,26 +472,46 @@ export default function Contact() {
                       </AnimatePresence>
                     </div>
 
-                    {/* Message Field */}
-                    <div>
-                      <label
-                        htmlFor="message"
-                        className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2"
-                      >
-                        Message <span className="text-rose-500">*</span>
-                      </label>
+                    {/* Message Floating Field */}
+                    <div className="relative pt-3">
                       <div className="relative">
                         <div className="absolute top-3.5 left-3.5 pointer-events-none text-slate-400">
                           <FiMessageSquare className="w-4 h-4" />
                         </div>
+
+                        {/* Floating Label */}
+                        <motion.label
+                          htmlFor="message"
+                          initial={false}
+                          animate={{
+                            y: focusedField === "message" || formData.message ? -24 : 12,
+                            scale: focusedField === "message" || formData.message ? 0.85 : 1,
+                            color:
+                              focusedField === "message"
+                                ? "#6c5ce7"
+                                : "#94a3b8",
+                          }}
+                          transition={{ duration: 0.2, ease: "easeOut" }}
+                          className="absolute left-10 pointer-events-none origin-left font-semibold text-xs uppercase tracking-wider z-10"
+                        >
+                          Message <span className="text-rose-500">*</span>
+                        </motion.label>
+
                         <textarea
                           id="message"
                           name="message"
                           rows={4}
                           value={formData.message}
+                          onFocus={() => setFocusedField("message")}
+                          onBlur={() => setFocusedField(null)}
                           onChange={handleChange}
-                          placeholder="Tell me about your project, role, or inquiry..."
-                          className={`w-full pl-10 pr-4 py-3 rounded-xl bg-slate-50 dark:bg-navy-dark/70 border ${
+                          data-cursor="hover"
+                          placeholder={
+                            focusedField === "message"
+                              ? "Tell me about your project, opportunity, or inquiry..."
+                              : ""
+                          }
+                          className={`w-full pl-10 pr-4 py-3.5 rounded-xl bg-slate-50 dark:bg-navy-dark/70 border ${
                             errors.message
                               ? "border-rose-500 focus:ring-rose-500/20"
                               : "border-slate-200 dark:border-navy-border focus:border-violet-accent dark:focus:border-electric-blue"
@@ -440,6 +539,7 @@ export default function Contact() {
                       whileTap={{ scale: 0.98 }}
                       type="submit"
                       disabled={isSubmitting}
+                      data-cursor="hover"
                       className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-gradient-to-r from-violet-accent to-electric-blue text-white font-medium text-sm sm:text-base shadow-lg shadow-violet-accent/25 hover:shadow-electric-blue/30 transition-all duration-200 cursor-pointer disabled:opacity-70"
                     >
                       {isSubmitting ? (
@@ -454,7 +554,7 @@ export default function Contact() {
                         </>
                       )}
                     </motion.button>
-                  </form>
+                  </motion.form>
                 )}
               </AnimatePresence>
             </div>

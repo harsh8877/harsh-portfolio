@@ -9,6 +9,30 @@ import {
   FiArrowUp,
 } from "react-icons/fi";
 import { useLenis } from "./SmoothScrollProvider";
+import Magnetic from "./Magnetic";
+
+const footerContainerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.12,
+      delayChildren: 0.1,
+    },
+  },
+};
+
+const footerItemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.55,
+      ease: "easeOut",
+    },
+  },
+};
 
 export default function Footer() {
   const lenis = useLenis();
@@ -108,22 +132,35 @@ export default function Footer() {
 
   return (
     <footer className="relative border-t border-slate-200/80 dark:border-navy-border/50 bg-white/70 dark:bg-navy-dark/80 backdrop-blur-md pt-12 pb-8 px-4 sm:px-6 lg:px-8 overflow-hidden">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-8 pb-8 border-b border-slate-200/80 dark:border-navy-border/50">
+      <motion.div
+        variants={footerContainerVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+        className="max-w-7xl mx-auto"
+      >
+        {/* Top Row: Brand, Nav Links & Social Icons */}
+        <motion.div
+          variants={footerItemVariants}
+          className="flex flex-col md:flex-row items-center justify-between gap-8 pb-8 border-b border-slate-200/80 dark:border-navy-border/50"
+        >
           {/* Left: Brand Logo & Title */}
           <div className="flex flex-col items-center md:items-start text-center md:text-left">
-            <a
-              href="#home"
-              onClick={(e) => handleLinkClick(e, "#home")}
-              className="flex items-center gap-2 text-lg font-bold font-poppins text-slate-900 dark:text-white group"
-            >
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-tr from-violet-accent to-electric-blue text-white text-xs font-extrabold shadow-md shadow-violet-accent/20">
-                HV
-              </span>
-              <span className="bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 dark:from-white dark:via-slate-200 dark:to-slate-400 bg-clip-text text-transparent group-hover:from-violet-accent group-hover:to-electric-blue transition-all">
-                Harsh Vasoya
-              </span>
-            </a>
+            <Magnetic maxDistance={8}>
+              <a
+                href="#home"
+                onClick={(e) => handleLinkClick(e, "#home")}
+                data-cursor="hover"
+                className="flex items-center gap-2 text-lg font-bold font-poppins text-slate-900 dark:text-white group"
+              >
+                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-tr from-violet-accent to-electric-blue text-white text-xs font-extrabold shadow-md shadow-violet-accent/20">
+                  HV
+                </span>
+                <span className="bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 dark:from-white dark:via-slate-200 dark:to-slate-400 bg-clip-text text-transparent group-hover:from-violet-accent group-hover:to-electric-blue transition-all">
+                  Harsh Vasoya
+                </span>
+              </a>
+            </Magnetic>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5 max-w-xs">
               MERN Stack Developer building modern, responsive, and high-performance web applications.
             </p>
@@ -136,6 +173,7 @@ export default function Footer() {
                 key={link.name}
                 href={link.href}
                 onClick={(e) => handleLinkClick(e, link.href)}
+                data-cursor="hover"
                 className="hover:text-violet-accent dark:hover:text-electric-blue transition-colors cursor-pointer"
               >
                 {link.name}
@@ -148,45 +186,57 @@ export default function Footer() {
             {socialLinks.map((social) => {
               const Icon = social.icon;
               return (
-                <a
-                  key={social.name}
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={social.name}
-                  className={`p-2.5 rounded-xl border border-slate-200 dark:border-navy-border bg-slate-50 dark:bg-navy-card/80 text-slate-600 dark:text-slate-300 shadow-sm transition-all duration-200 cursor-pointer ${social.hoverClass}`}
-                >
-                  <Icon className="w-4 h-4" />
-                </a>
+                <Magnetic key={social.name} maxDistance={6}>
+                  <a
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={social.name}
+                    data-cursor="hover"
+                    className={`p-2.5 rounded-xl border border-slate-200 dark:border-navy-border bg-slate-50 dark:bg-navy-card/80 text-slate-600 dark:text-slate-300 shadow-sm transition-all duration-200 cursor-pointer block ${social.hoverClass}`}
+                  >
+                    <Icon className="w-4 h-4" />
+                  </a>
+                </Magnetic>
               );
             })}
           </div>
-        </div>
+        </motion.div>
 
-        {/* Bottom Copyright & Credit */}
-        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400 text-center sm:text-left">
+        {/* Bottom Copyright & Credit Row */}
+        <motion.div
+          variants={footerItemVariants}
+          className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400 text-center sm:text-left"
+        >
           <p>© 2026 Harsh Vasoya. All rights reserved.</p>
           <p className="flex items-center gap-1.5 justify-center">
             <span>Built with Next.js, Tailwind CSS &amp; Framer Motion</span>
           </p>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
-      {/* Floating Animated Back to Top Button */}
+      {/* Floating Animated Back to Top Button with Magnetic Hover */}
       <AnimatePresence>
         {showBackToTop && (
-          <motion.button
+          <motion.div
             initial={{ opacity: 0, scale: 0.7, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.7, y: 20 }}
-            whileHover={{ scale: 1.1, y: -2 }}
-            whileTap={{ scale: 0.9 }}
-            onClick={scrollToTop}
-            aria-label="Back to top"
-            className="fixed bottom-6 right-6 z-40 p-3 rounded-2xl bg-gradient-to-tr from-violet-accent to-electric-blue text-white shadow-xl shadow-violet-accent/25 hover:shadow-electric-blue/35 transition-shadow cursor-pointer flex items-center justify-center"
+            className="fixed bottom-6 right-6 z-40"
           >
-            <FiArrowUp className="w-5 h-5" />
-          </motion.button>
+            <Magnetic maxDistance={12}>
+              <motion.button
+                whileHover={{ scale: 1.08 }}
+                whileTap={{ scale: 0.92 }}
+                onClick={scrollToTop}
+                data-cursor="hover"
+                aria-label="Back to top"
+                className="p-3.5 rounded-2xl bg-gradient-to-tr from-violet-accent to-electric-blue text-white shadow-xl shadow-violet-accent/30 hover:shadow-electric-blue/40 transition-shadow cursor-pointer flex items-center justify-center"
+              >
+                <FiArrowUp className="w-5 h-5" />
+              </motion.button>
+            </Magnetic>
+          </motion.div>
         )}
       </AnimatePresence>
     </footer>
