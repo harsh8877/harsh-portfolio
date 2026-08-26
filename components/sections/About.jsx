@@ -1,6 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
+import { motion, useInView, useMotionValue, animate } from "framer-motion";
 import {
   FiBriefcase,
   FiCode,
@@ -11,6 +12,39 @@ import {
   FiDownload,
 } from "react-icons/fi";
 import { useLenis } from "@/components/SmoothScrollProvider";
+
+// Animated counter component for stat badges
+function AnimatedCounter({ value, suffix = "", prefix = "" }) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, amount: 0.4 });
+  const count = useMotionValue(0);
+  const [displayValue, setDisplayValue] = useState(0);
+
+  useEffect(() => {
+    if (isInView && typeof value === "number") {
+      const controls = animate(count, value, {
+        duration: 1.5,
+        ease: "easeOut",
+        onUpdate: (latest) => {
+          setDisplayValue(Math.floor(latest));
+        },
+      });
+      return () => controls.stop();
+    }
+  }, [isInView, count, value]);
+
+  if (typeof value !== "number") {
+    return <span>{value}</span>;
+  }
+
+  return (
+    <span ref={ref}>
+      {prefix}
+      {displayValue}
+      {suffix}
+    </span>
+  );
+}
 
 export default function About() {
   const lenis = useLenis();
@@ -39,21 +73,23 @@ export default function About() {
   const stats = [
     {
       icon: FiBriefcase,
-      value: "1+ Year",
+      numericValue: 1,
+      suffix: "+ Year",
       label: "Experience",
       description: "Hands-on Development",
       gradient: "from-violet-accent to-indigo-500",
     },
     {
       icon: FiCode,
-      value: "4+ Projects",
+      numericValue: 4,
+      suffix: "+ Projects",
       label: "Built",
       description: "Full-Stack & Frontend",
       gradient: "from-electric-blue to-cyan-500",
     },
     {
       icon: FiAward,
-      value: "B.Tech IT",
+      displayValue: "B.Tech IT",
       label: "Graduate",
       description: "Information Technology",
       gradient: "from-purple-500 to-pink-500",
@@ -91,7 +127,10 @@ export default function About() {
             Know More About Me
           </div>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold font-poppins tracking-tight text-slate-900 dark:text-white mb-4">
-            About <span className="bg-gradient-to-r from-violet-accent to-electric-blue bg-clip-text text-transparent">Me</span>
+            About{" "}
+            <span className="bg-gradient-to-r from-violet-accent to-electric-blue bg-clip-text text-transparent">
+              Me
+            </span>
           </h2>
           <p className="text-slate-600 dark:text-slate-400 text-base sm:text-lg">
             A passionate engineer dedicated to building seamless, responsive, and impactful digital experiences.
@@ -115,7 +154,6 @@ export default function About() {
               {/* Photo Frame Container */}
               <div className="relative rounded-2xl bg-white dark:bg-navy-card border border-slate-200 dark:border-navy-border p-5 sm:p-6 shadow-2xl overflow-hidden backdrop-blur-md">
                 {/* Photo Placeholder Area */}
-                {/* TODO: replace with my profile photo */}
                 <div className="relative w-full aspect-[4/5] rounded-xl overflow-hidden bg-gradient-to-br from-slate-100 via-slate-200 to-slate-100 dark:from-navy-dark dark:via-navy dark:to-navy-light flex flex-col items-center justify-center border border-slate-300/60 dark:border-navy-border/80 group-hover:scale-[1.02] transition-transform duration-500">
                   {/* Stylized Avatar Placeholder */}
                   <div className="relative z-10 flex flex-col items-center justify-center p-6 text-center">
@@ -128,7 +166,7 @@ export default function About() {
                       Profile Picture
                     </span>
                     <p className="text-xs text-slate-500 dark:text-slate-400 max-w-[200px]">
-                      Full-Stack & MERN Developer
+                      Full-Stack &amp; MERN Developer
                     </p>
                   </div>
 
@@ -193,7 +231,7 @@ export default function About() {
               </p>
             </div>
 
-            {/* Small Stat Badges */}
+            {/* Small Stat Badges with Counting-Up Numbers */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
               {stats.map((stat, idx) => {
                 const Icon = stat.icon;
@@ -205,6 +243,7 @@ export default function About() {
                     viewport={{ once: true }}
                     transition={{ delay: idx * 0.1, duration: 0.5 }}
                     whileHover={{ y: -4 }}
+                    data-cursor="hover"
                     className="p-4 rounded-xl border border-slate-200 dark:border-navy-border bg-white/70 dark:bg-navy-card/70 backdrop-blur-md shadow-md transition-all duration-200 flex flex-col justify-between"
                   >
                     <div className="flex items-center justify-between mb-2">
@@ -217,7 +256,14 @@ export default function About() {
                     </div>
                     <div>
                       <h4 className="text-xl sm:text-2xl font-bold font-poppins text-slate-900 dark:text-white">
-                        {stat.value}
+                        {stat.numericValue !== undefined ? (
+                          <AnimatedCounter
+                            value={stat.numericValue}
+                            suffix={stat.suffix}
+                          />
+                        ) : (
+                          stat.displayValue
+                        )}
                       </h4>
                       <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                         {stat.description}
@@ -251,6 +297,7 @@ export default function About() {
               <a
                 href="#projects"
                 onClick={scrollToProjects}
+                data-cursor="hover"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-violet-accent to-electric-blue text-white font-medium text-sm shadow-md shadow-violet-accent/20 hover:shadow-electric-blue/30 hover:scale-105 active:scale-95 transition-all duration-200 min-h-[44px]"
               >
                 <span>View My Projects</span>
@@ -262,6 +309,7 @@ export default function About() {
                 target="_blank"
                 rel="noopener noreferrer"
                 download="Harsh_Vasoya_Resume.pdf"
+                data-cursor="hover"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-slate-300 dark:border-navy-border bg-white/80 dark:bg-navy-card/80 text-slate-800 dark:text-slate-200 hover:text-violet-accent dark:hover:text-electric-blue hover:border-violet-accent/40 font-medium text-sm backdrop-blur-md hover:scale-105 active:scale-95 transition-all duration-200 shadow-sm min-h-[44px]"
               >
                 <FiDownload className="w-4 h-4" />

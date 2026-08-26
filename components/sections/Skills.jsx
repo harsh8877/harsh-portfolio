@@ -1,7 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useRef } from "react";
+import {
+  motion,
+  AnimatePresence,
+  useMotionValue,
+  useSpring,
+  useTransform,
+} from "framer-motion";
 import {
   SiHtml5,
   SiCss,
@@ -182,7 +188,7 @@ const containerVariants = {
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.06,
+      staggerChildren: 0.05,
     },
   },
 };
@@ -197,6 +203,109 @@ const itemVariants = {
   },
   exit: { opacity: 0, scale: 0.9, transition: { duration: 0.2 } },
 };
+
+// 3D Tilt Skill Badge Component
+function SkillTiltCard({ skill }) {
+  const cardRef = useRef(null);
+
+  // Normalized mouse coordinates relative to badge center (-0.5 to 0.5)
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  // Smooth springs for natural tilt responsiveness and recovery
+  const mouseXSpring = useSpring(x, { stiffness: 280, damping: 20 });
+  const mouseYSpring = useSpring(y, { stiffness: 280, damping: 20 });
+
+  // 3D rotation transforms
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["14deg", "-14deg"]);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-14deg", "14deg"]);
+  const glowX = useTransform(mouseXSpring, [-0.5, 0.5], ["10%", "90%"]);
+  const glowY = useTransform(mouseYSpring, [-0.5, 0.5], ["10%", "90%"]);
+
+  const handleMouseMove = (e) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+
+    const xPct = mouseX / width - 0.5;
+    const yPct = mouseY / height - 0.5;
+
+    x.set(xPct);
+    y.set(yPct);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+
+  const Icon = skill.icon;
+
+  return (
+    <motion.div
+      ref={cardRef}
+      variants={itemVariants}
+      layout
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      data-cursor="hover"
+      style={{
+        rotateX,
+        rotateY,
+        transformStyle: "preserve-3d",
+      }}
+      whileHover={{
+        scale: 1.06,
+        y: -5,
+        boxShadow: `0 20px 35px -10px ${skill.color}35`,
+        borderColor: `${skill.color}80`,
+      }}
+      whileTap={{ scale: 0.96 }}
+      className="group relative flex flex-col items-center justify-between p-3.5 sm:p-5 rounded-2xl bg-white/85 dark:bg-navy-card/90 border border-slate-200 dark:border-navy-border shadow-sm hover:shadow-xl backdrop-blur-md transition-colors duration-200 cursor-pointer overflow-hidden min-h-[135px] sm:min-h-[155px] select-none will-change-transform"
+    >
+      {/* Dynamic 3D Cursor Ambient Glow */}
+      <motion.div
+        className="absolute w-28 h-28 rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-300 blur-xl pointer-events-none -translate-x-1/2 -translate-y-1/2"
+        style={{
+          backgroundColor: skill.color,
+          left: glowX,
+          top: glowY,
+        }}
+      />
+
+      {/* Skill Icon with 3D Pop (translateZ) */}
+      <div
+        className="w-11 h-11 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center p-2 sm:p-2.5 transition-transform duration-300 group-hover:scale-110"
+        style={{
+          backgroundColor: `${skill.color}15`,
+          transform: "translateZ(20px)",
+        }}
+      >
+        <Icon
+          className="w-6 h-6 sm:w-8 sm:h-8 transition-colors duration-300"
+          style={{ color: skill.color }}
+        />
+      </div>
+
+      {/* Skill Name & Level Badge */}
+      <div
+        className="text-center w-full mt-2"
+        style={{ transform: "translateZ(15px)" }}
+      >
+        <h3 className="text-sm sm:text-base font-bold font-poppins text-slate-800 dark:text-slate-100 group-hover:text-violet-accent dark:group-hover:text-electric-blue transition-colors duration-200 truncate">
+          {skill.name}
+        </h3>
+        <span className="inline-block text-[10px] sm:text-[11px] font-medium text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-navy-light px-2 py-0.5 rounded-md mt-1 border border-slate-200/60 dark:border-navy-border/60">
+          {skill.level}
+        </span>
+      </div>
+    </motion.div>
+  );
+}
 
 export default function Skills() {
   const [activeTab, setActiveTab] = useState("all");
@@ -254,6 +363,7 @@ export default function Skills() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
+                data-cursor="hover"
                 className={`relative flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 cursor-pointer min-h-[36px] sm:min-h-[40px] ${
                   isActive
                     ? "text-white dark:text-white font-semibold shadow-md shadow-violet-accent/25"
@@ -274,62 +384,19 @@ export default function Skills() {
           })}
         </motion.div>
 
-        {/* Skills Grid: 2 cols on mobile, 3-4 on tablet, 5-6 on desktop */}
+        {/* Skills Grid with 3D perspective */}
         <motion.div
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.1 }}
+          style={{ perspective: 1000 }}
           className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2.5 sm:gap-4 md:gap-5"
         >
           <AnimatePresence mode="popLayout">
-            {filteredSkills.map((skill) => {
-              const Icon = skill.icon;
-              return (
-                <motion.div
-                  key={skill.name}
-                  variants={itemVariants}
-                  layout
-                  whileHover={{
-                    scale: 1.05,
-                    y: -4,
-                    boxShadow: `0 16px 30px -10px ${skill.color}30`,
-                    borderColor: `${skill.color}80`,
-                  }}
-                  whileTap={{ scale: 0.96 }}
-                  className="group relative flex flex-col items-center justify-between p-3.5 sm:p-5 rounded-2xl bg-white/80 dark:bg-navy-card/90 border border-slate-200 dark:border-navy-border shadow-sm hover:shadow-xl backdrop-blur-md transition-all duration-300 cursor-pointer overflow-hidden min-h-[135px] sm:min-h-[155px]"
-                >
-                  {/* Subtle top ambient glow inside the card on hover */}
-                  <div
-                    className="absolute -top-12 -right-12 w-24 h-24 rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-300 blur-xl pointer-events-none"
-                    style={{ backgroundColor: skill.color }}
-                  />
-
-                  {/* Skill Icon */}
-                  <div
-                    className="w-11 h-11 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center p-2 sm:p-2.5 transition-transform duration-300 group-hover:scale-110"
-                    style={{
-                      backgroundColor: `${skill.color}15`,
-                    }}
-                  >
-                    <Icon
-                      className="w-6 h-6 sm:w-8 sm:h-8 transition-colors duration-300"
-                      style={{ color: skill.color }}
-                    />
-                  </div>
-
-                  {/* Skill Name & Level Badge */}
-                  <div className="text-center w-full mt-2">
-                    <h3 className="text-sm sm:text-base font-bold font-poppins text-slate-800 dark:text-slate-100 group-hover:text-violet-accent dark:group-hover:text-electric-blue transition-colors duration-200 truncate">
-                      {skill.name}
-                    </h3>
-                    <span className="inline-block text-[10px] sm:text-[11px] font-medium text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-navy-light px-2 py-0.5 rounded-md mt-1 border border-slate-200/60 dark:border-navy-border/60">
-                      {skill.level}
-                    </span>
-                  </div>
-                </motion.div>
-              );
-            })}
+            {filteredSkills.map((skill) => (
+              <SkillTiltCard key={skill.name} skill={skill} />
+            ))}
           </AnimatePresence>
         </motion.div>
 
