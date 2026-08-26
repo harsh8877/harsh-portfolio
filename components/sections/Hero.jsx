@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 import {
   FiGithub,
   FiLinkedin,
@@ -17,6 +17,11 @@ const TYPING_PHRASES = [
   "MERN Stack Developer",
   "React.js Developer",
   "Frontend Engineer",
+];
+
+const NAME_WORDS = [
+  { word: "Harsh", chars: ["H", "a", "r", "s", "h"] },
+  { word: "Vasoya", chars: ["V", "a", "s", "o", "y", "a"] },
 ];
 
 // Custom typewriter hook
@@ -59,8 +64,21 @@ function useTypewriter(phrases, typingSpeed = 100, deletingSpeed = 50, pauseTime
 }
 
 export default function Hero() {
+  const heroRef = useRef(null);
   const lenis = useLenis();
   const typedRole = useTypewriter(TYPING_PHRASES);
+
+  // Parallax depth transforms based on scroll through the Hero section
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"],
+  });
+
+  const contentY = useTransform(scrollYProgress, [0, 1], [0, 75]);
+  const contentOpacity = useTransform(scrollYProgress, [0, 0.85], [1, 0.2]);
+  const blob1Y = useTransform(scrollYProgress, [0, 1], [0, -110]);
+  const blob2Y = useTransform(scrollYProgress, [0, 1], [0, 130]);
+  const gridY = useTransform(scrollYProgress, [0, 1], [0, 45]);
 
   const scrollToContact = (e) => {
     e.preventDefault();
@@ -103,15 +121,48 @@ export default function Hero() {
     },
   ];
 
+  // Framer Motion variants for character-by-character typewriter reveal
+  const titleContainerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.035,
+        delayChildren: 0.15,
+      },
+    },
+  };
+
+  const charVariants = {
+    hidden: {
+      opacity: 0,
+      y: 30,
+      filter: "blur(4px)",
+    },
+    visible: {
+      opacity: 1,
+      y: 0,
+      filter: "blur(0px)",
+      transition: {
+        type: "spring",
+        damping: 14,
+        stiffness: 220,
+        duration: 0.45,
+      },
+    },
+  };
+
   return (
     <section
       id="home"
+      ref={heroRef}
       className="relative min-h-[92vh] flex items-center justify-center overflow-hidden py-16 md:py-24 px-4 sm:px-6 lg:px-8"
     >
-      {/* Subtle Background Glows and Grid */}
-      <div className="absolute inset-0 -z-10 pointer-events-none">
+      {/* Subtle Background Glows and Grid with Parallax Transform */}
+      <div className="absolute inset-0 -z-10 pointer-events-none overflow-hidden">
         {/* Animated Gradient Blob 1 */}
         <motion.div
+          style={{ y: blob1Y }}
           animate={{
             x: [0, 40, -20, 0],
             y: [0, -40, 20, 0],
@@ -127,6 +178,7 @@ export default function Hero() {
 
         {/* Animated Gradient Blob 2 */}
         <motion.div
+          style={{ y: blob2Y }}
           animate={{
             x: [0, -50, 30, 0],
             y: [0, 50, -30, 0],
@@ -141,10 +193,17 @@ export default function Hero() {
         />
 
         {/* Background Grid Pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:28px_28px] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_50%,#000_70%,transparent_100%)]" />
+        <motion.div
+          style={{ y: gridY }}
+          className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:28px_28px] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_50%,#000_70%,transparent_100%)]"
+        />
       </div>
 
-      <div className="max-w-4xl mx-auto text-center relative z-10 w-full">
+      {/* Main Hero Content Container with Parallax Translation and Fade */}
+      <motion.div
+        style={{ y: contentY, opacity: contentOpacity }}
+        className="max-w-4xl mx-auto text-center relative z-10 w-full"
+      >
         {/* Location & Status Badge */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -166,27 +225,46 @@ export default function Hero() {
           </span>
         </motion.div>
 
-        {/* Name / Main Heading */}
-        <motion.div
-          initial={{ opacity: 0, y: 25 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-        >
-          <p className="text-xs sm:text-base md:text-lg font-medium text-violet-accent dark:text-electric-blue mb-2 font-poppins tracking-wider uppercase">
+        {/* Name / Main Heading with Staggered Character Typewriter Reveal */}
+        <div className="mb-3 sm:mb-4">
+          <motion.p
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45 }}
+            className="text-xs sm:text-base md:text-lg font-medium text-violet-accent dark:text-electric-blue mb-2 font-poppins tracking-wider uppercase"
+          >
             Hi, I&apos;m
-          </p>
-          <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold font-poppins tracking-tight text-slate-900 dark:text-white mb-3 sm:mb-4 leading-tight">
-            <span className="bg-gradient-to-r from-slate-900 via-violet-900 to-slate-900 dark:from-white dark:via-slate-100 dark:to-slate-300 bg-clip-text text-transparent">
-              Harsh Vasoya
-            </span>
-          </h1>
-        </motion.div>
+          </motion.p>
+          <motion.h1
+            variants={titleContainerVariants}
+            initial="hidden"
+            animate="visible"
+            className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold font-poppins tracking-tight text-slate-900 dark:text-white leading-tight flex flex-wrap items-center justify-center gap-x-3 sm:gap-x-4 select-none"
+          >
+            {NAME_WORDS.map((wordObj, wordIdx) => (
+              <span
+                key={wordIdx}
+                className="inline-flex whitespace-nowrap overflow-visible"
+              >
+                {wordObj.chars.map((char, charIdx) => (
+                  <motion.span
+                    key={charIdx}
+                    variants={charVariants}
+                    className="inline-block bg-gradient-to-r from-slate-900 via-violet-900 to-slate-900 dark:from-white dark:via-slate-100 dark:to-slate-300 bg-clip-text text-transparent transform-gpu"
+                  >
+                    {char}
+                  </motion.span>
+                ))}
+              </span>
+            ))}
+          </motion.h1>
+        </div>
 
         {/* Animated Typing Text */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
+          transition={{ duration: 0.6, delay: 0.35 }}
           className="min-h-[2.5rem] sm:min-h-[3rem] flex items-center justify-center mb-5 sm:mb-6"
         >
           <p className="text-base sm:text-2xl md:text-3xl font-semibold font-poppins text-slate-700 dark:text-slate-200">
@@ -202,7 +280,7 @@ export default function Hero() {
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
+          transition={{ duration: 0.6, delay: 0.45 }}
           className="text-slate-600 dark:text-slate-400 text-sm sm:text-lg md:text-xl max-w-2xl mx-auto leading-relaxed mb-8 sm:mb-10 px-2"
         >
           Passionate about crafting dynamic, responsive, and high-performance web
@@ -213,7 +291,7 @@ export default function Hero() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
+          transition={{ duration: 0.6, delay: 0.55 }}
           className="flex flex-col sm:flex-row items-center justify-center gap-3.5 sm:gap-5 mb-10 sm:mb-12 w-full max-w-xs sm:max-w-none mx-auto"
         >
           {/* Download Resume Button */}
@@ -253,28 +331,30 @@ export default function Hero() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.5 }}
+          transition={{ duration: 0.6, delay: 0.65 }}
           className="flex items-center justify-center gap-3 sm:gap-4"
         >
           {socialLinks.map((social) => {
             const Icon = social.icon;
             return (
-              <motion.a
-                key={social.name}
-                href={social.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={social.name}
-                whileHover={{ scale: 1.12, y: -2 }}
-                whileTap={{ scale: 0.92 }}
-                className={`p-3 sm:p-3.5 rounded-xl border border-slate-200 dark:border-navy-border bg-white/80 dark:bg-navy-card/80 text-slate-600 dark:text-slate-300 shadow-sm backdrop-blur-md transition-all duration-200 cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center ${social.hoverClass}`}
-              >
-                <Icon className="h-4 sm:h-5 w-4 sm:h-5" />
-              </motion.a>
+              <Magnetic key={social.name} maxDistance={8}>
+                <motion.a
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={social.name}
+                  data-cursor="hover"
+                  whileHover={{ scale: 1.12, y: -2 }}
+                  whileTap={{ scale: 0.92 }}
+                  className={`p-3 sm:p-3.5 rounded-xl border border-slate-200 dark:border-navy-border bg-white/80 dark:bg-navy-card/80 text-slate-600 dark:text-slate-300 shadow-sm backdrop-blur-md transition-all duration-200 cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center ${social.hoverClass}`}
+                >
+                  <Icon className="h-4 sm:h-5 w-4 sm:h-5" />
+                </motion.a>
+              </Magnetic>
             );
           })}
         </motion.div>
-      </div>
+      </motion.div>
     </section>
   );
 }
