@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import {
   FiMail,
   FiPhone,
@@ -18,6 +18,7 @@ import {
 } from "react-icons/fi";
 
 export default function Contact() {
+  const shouldReduceMotion = useReducedMotion();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -123,11 +124,15 @@ export default function Contact() {
       {/* Background Animated Blobs and Grid Pattern */}
       <div className="absolute inset-0 -z-10 pointer-events-none">
         <motion.div
-          animate={{
-            x: [0, -30, 20, 0],
-            y: [0, 30, -20, 0],
-            scale: [1, 1.1, 0.95, 1],
-          }}
+          animate={
+            shouldReduceMotion
+              ? undefined
+              : {
+                  x: [0, -30, 20, 0],
+                  y: [0, 30, -20, 0],
+                  scale: [1, 1.1, 0.95, 1],
+                }
+          }
           transition={{
             duration: 16,
             repeat: Infinity,
@@ -137,11 +142,15 @@ export default function Contact() {
         />
 
         <motion.div
-          animate={{
-            x: [0, 40, -30, 0],
-            y: [0, -40, 30, 0],
-            scale: [1, 1.15, 0.9, 1],
-          }}
+          animate={
+            shouldReduceMotion
+              ? undefined
+              : {
+                  x: [0, 40, -30, 0],
+                  y: [0, -40, 30, 0],
+                  scale: [1, 1.15, 0.9, 1],
+                }
+          }
           transition={{
             duration: 18,
             repeat: Infinity,
@@ -156,7 +165,7 @@ export default function Contact() {
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.6 }}
@@ -181,7 +190,7 @@ export default function Contact() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
           {/* Left Column: Direct Contact Info */}
           <motion.div
-            initial={{ opacity: 0, x: -35 }}
+            initial={{ opacity: 0, x: shouldReduceMotion ? 0 : -35 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.6 }}
@@ -268,7 +277,7 @@ export default function Contact() {
 
           {/* Right Column: Animated Contact Form */}
           <motion.div
-            initial={{ opacity: 0, x: 35 }}
+            initial={{ opacity: 0, x: shouldReduceMotion ? 0 : 35 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.6 }}
@@ -280,14 +289,18 @@ export default function Contact() {
                   /* Animated Success State with Spring & SVG Path Checkmark */
                   <motion.div
                     key="success-message"
-                    initial={{ opacity: 0, scale: 0.85, y: 25 }}
+                    initial={{ opacity: 0, scale: shouldReduceMotion ? 1 : 0.85, y: shouldReduceMotion ? 0 : 25 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.85, y: -20 }}
-                    transition={{
-                      type: "spring",
-                      damping: 20,
-                      stiffness: 260,
-                    }}
+                    exit={{ opacity: 0, scale: shouldReduceMotion ? 1 : 0.85, y: shouldReduceMotion ? 0 : -20 }}
+                    transition={
+                      shouldReduceMotion
+                        ? { duration: 0.2 }
+                        : {
+                            type: "spring",
+                            damping: 20,
+                            stiffness: 260,
+                          }
+                    }
                     className="py-12 flex flex-col items-center justify-center text-center space-y-4"
                   >
                     {/* Animated SVG Checkmark drawing itself */}
@@ -304,9 +317,9 @@ export default function Contact() {
                           stroke="currentColor"
                           strokeWidth="3"
                           strokeLinecap="round"
-                          initial={{ pathLength: 0, opacity: 0 }}
+                          initial={{ pathLength: shouldReduceMotion ? 1 : 0, opacity: shouldReduceMotion ? 1 : 0 }}
                           animate={{ pathLength: 1, opacity: 1 }}
-                          transition={{ duration: 0.5, ease: "easeOut" }}
+                          transition={{ duration: shouldReduceMotion ? 0 : 0.5, ease: "easeOut" }}
                         />
                         <motion.path
                           d="M15 27l8 8 16-16"
@@ -314,13 +327,17 @@ export default function Contact() {
                           strokeWidth="3.5"
                           strokeLinecap="round"
                           strokeLinejoin="round"
-                          initial={{ pathLength: 0 }}
+                          initial={{ pathLength: shouldReduceMotion ? 1 : 0 }}
                           animate={{ pathLength: 1 }}
-                          transition={{
-                            duration: 0.45,
-                            delay: 0.35,
-                            ease: "easeOut",
-                          }}
+                          transition={
+                            shouldReduceMotion
+                              ? { duration: 0 }
+                              : {
+                                  duration: 0.45,
+                                  delay: 0.35,
+                                  ease: "easeOut",
+                                }
+                          }
                         />
                       </svg>
                     </div>

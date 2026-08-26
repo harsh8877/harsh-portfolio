@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import {
   FiGithub,
   FiLinkedin,
@@ -67,6 +67,7 @@ export default function Hero() {
   const heroRef = useRef(null);
   const lenis = useLenis();
   const typedRole = useTypewriter(TYPING_PHRASES);
+  const shouldReduceMotion = useReducedMotion();
 
   // Parallax depth transforms based on scroll through the Hero section
   const { scrollYProgress } = useScroll({
@@ -74,11 +75,17 @@ export default function Hero() {
     offset: ["start start", "end start"],
   });
 
-  const contentY = useTransform(scrollYProgress, [0, 1], [0, 75]);
-  const contentOpacity = useTransform(scrollYProgress, [0, 0.85], [1, 0.2]);
-  const blob1Y = useTransform(scrollYProgress, [0, 1], [0, -110]);
-  const blob2Y = useTransform(scrollYProgress, [0, 1], [0, 130]);
-  const gridY = useTransform(scrollYProgress, [0, 1], [0, 45]);
+  const rawContentY = useTransform(scrollYProgress, [0, 1], [0, 75]);
+  const rawContentOpacity = useTransform(scrollYProgress, [0, 0.85], [1, 0.2]);
+  const rawBlob1Y = useTransform(scrollYProgress, [0, 1], [0, -110]);
+  const rawBlob2Y = useTransform(scrollYProgress, [0, 1], [0, 130]);
+  const rawGridY = useTransform(scrollYProgress, [0, 1], [0, 45]);
+
+  const contentY = shouldReduceMotion ? 0 : rawContentY;
+  const contentOpacity = shouldReduceMotion ? 1 : rawContentOpacity;
+  const blob1Y = shouldReduceMotion ? 0 : rawBlob1Y;
+  const blob2Y = shouldReduceMotion ? 0 : rawBlob2Y;
+  const gridY = shouldReduceMotion ? 0 : rawGridY;
 
   const scrollToContact = (e) => {
     e.preventDefault();
@@ -126,29 +133,33 @@ export default function Hero() {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: {
-        staggerChildren: 0.035,
-        delayChildren: 0.15,
-      },
+      transition: shouldReduceMotion
+        ? { duration: 0.3 }
+        : {
+            staggerChildren: 0.035,
+            delayChildren: 0.15,
+          },
     },
   };
 
   const charVariants = {
     hidden: {
       opacity: 0,
-      y: 30,
-      filter: "blur(4px)",
+      y: shouldReduceMotion ? 0 : 30,
+      filter: shouldReduceMotion ? "none" : "blur(4px)",
     },
     visible: {
       opacity: 1,
       y: 0,
       filter: "blur(0px)",
-      transition: {
-        type: "spring",
-        damping: 14,
-        stiffness: 220,
-        duration: 0.45,
-      },
+      transition: shouldReduceMotion
+        ? { duration: 0.2 }
+        : {
+            type: "spring",
+            damping: 14,
+            stiffness: 220,
+            duration: 0.45,
+          },
     },
   };
 
@@ -163,11 +174,15 @@ export default function Hero() {
         {/* Animated Gradient Blob 1 */}
         <motion.div
           style={{ y: blob1Y }}
-          animate={{
-            x: [0, 40, -20, 0],
-            y: [0, -40, 20, 0],
-            scale: [1, 1.15, 0.95, 1],
-          }}
+          animate={
+            shouldReduceMotion
+              ? undefined
+              : {
+                  x: [0, 40, -20, 0],
+                  y: [0, -40, 20, 0],
+                  scale: [1, 1.15, 0.95, 1],
+                }
+          }
           transition={{
             duration: 14,
             repeat: Infinity,
@@ -179,11 +194,15 @@ export default function Hero() {
         {/* Animated Gradient Blob 2 */}
         <motion.div
           style={{ y: blob2Y }}
-          animate={{
-            x: [0, -50, 30, 0],
-            y: [0, 50, -30, 0],
-            scale: [1, 1.2, 0.9, 1],
-          }}
+          animate={
+            shouldReduceMotion
+              ? undefined
+              : {
+                  x: [0, -50, 30, 0],
+                  y: [0, 50, -30, 0],
+                  scale: [1, 1.2, 0.9, 1],
+                }
+          }
           transition={{
             duration: 18,
             repeat: Infinity,
@@ -206,7 +225,7 @@ export default function Hero() {
       >
         {/* Location & Status Badge */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           className="inline-flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 rounded-full border border-slate-300/80 dark:border-navy-border bg-white/85 dark:bg-navy-card/85 px-3.5 sm:px-4 py-1.5 text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 backdrop-blur-md shadow-sm mb-6 sm:mb-8 max-w-full"
@@ -228,7 +247,7 @@ export default function Hero() {
         {/* Name / Main Heading with Staggered Character Typewriter Reveal */}
         <div className="mb-3 sm:mb-4">
           <motion.p
-            initial={{ opacity: 0, y: 15 }}
+            initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45 }}
             className="text-xs sm:text-base md:text-lg font-medium text-violet-accent dark:text-electric-blue mb-2 font-poppins tracking-wider uppercase"
@@ -262,9 +281,9 @@ export default function Hero() {
 
         {/* Animated Typing Text */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.35 }}
+          transition={{ duration: 0.6, delay: shouldReduceMotion ? 0 : 0.35 }}
           className="min-h-[2.5rem] sm:min-h-[3rem] flex items-center justify-center mb-5 sm:mb-6"
         >
           <p className="text-base sm:text-2xl md:text-3xl font-semibold font-poppins text-slate-700 dark:text-slate-200">
@@ -278,9 +297,9 @@ export default function Hero() {
 
         {/* Tagline */}
         <motion.p
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.45 }}
+          transition={{ duration: 0.6, delay: shouldReduceMotion ? 0 : 0.45 }}
           className="text-slate-600 dark:text-slate-400 text-sm sm:text-lg md:text-xl max-w-2xl mx-auto leading-relaxed mb-8 sm:mb-10 px-2"
         >
           Passionate about crafting dynamic, responsive, and high-performance web
@@ -289,16 +308,16 @@ export default function Hero() {
 
         {/* CTA Buttons */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.55 }}
+          transition={{ duration: 0.6, delay: shouldReduceMotion ? 0 : 0.55 }}
           className="flex flex-col sm:flex-row items-center justify-center gap-3.5 sm:gap-5 mb-10 sm:mb-12 w-full max-w-xs sm:max-w-none mx-auto"
         >
           {/* Download Resume Button */}
           <Magnetic maxDistance={12} className="w-full sm:w-auto">
             <motion.a
-              whileHover={{ scale: 1.04 }}
-              whileTap={{ scale: 0.96 }}
+              whileHover={shouldReduceMotion ? undefined : { scale: 1.04 }}
+              whileTap={shouldReduceMotion ? undefined : { scale: 0.96 }}
               href="/resume.pdf"
               target="_blank"
               rel="noopener noreferrer"
@@ -314,8 +333,8 @@ export default function Hero() {
           {/* Contact Me Button */}
           <Magnetic maxDistance={12} className="w-full sm:w-auto">
             <motion.a
-              whileHover={{ scale: 1.04 }}
-              whileTap={{ scale: 0.96 }}
+              whileHover={shouldReduceMotion ? undefined : { scale: 1.04 }}
+              whileTap={shouldReduceMotion ? undefined : { scale: 0.96 }}
               href="#contact"
               onClick={scrollToContact}
               data-cursor="hover"
@@ -329,9 +348,9 @@ export default function Hero() {
 
         {/* Social Icons Row */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.65 }}
+          transition={{ duration: 0.6, delay: shouldReduceMotion ? 0 : 0.65 }}
           className="flex items-center justify-center gap-3 sm:gap-4"
         >
           {socialLinks.map((social) => {
@@ -344,11 +363,11 @@ export default function Hero() {
                   rel="noopener noreferrer"
                   aria-label={social.name}
                   data-cursor="hover"
-                  whileHover={{ scale: 1.12, y: -2 }}
-                  whileTap={{ scale: 0.92 }}
+                  whileHover={shouldReduceMotion ? undefined : { scale: 1.12, y: -2 }}
+                  whileTap={shouldReduceMotion ? undefined : { scale: 0.92 }}
                   className={`p-3 sm:p-3.5 rounded-xl border border-slate-200 dark:border-navy-border bg-white/80 dark:bg-navy-card/80 text-slate-600 dark:text-slate-300 shadow-sm backdrop-blur-md transition-all duration-200 cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center ${social.hoverClass}`}
                 >
-                  <Icon className="h-4 sm:h-5 w-4 sm:h-5" />
+                  <Icon className="h-4 sm:h-5 w-4 sm:w-5" />
                 </motion.a>
               </Magnetic>
             );

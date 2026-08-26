@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import {
   FiCalendar,
   FiMapPin,
@@ -14,14 +14,15 @@ import { TbCertificate } from "react-icons/tb";
 
 export default function Education() {
   const sectionRef = useRef(null);
+  const shouldReduceMotion = useReducedMotion();
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start 75%", "center center"],
   });
 
-  const dotScale = useTransform(scrollYProgress, [0, 1], [0.85, 1.15]);
-  const dotShadow = useTransform(
+  const rawDotScale = useTransform(scrollYProgress, [0, 1], [0.85, 1.15]);
+  const rawDotShadow = useTransform(
     scrollYProgress,
     [0, 1],
     [
@@ -29,11 +30,17 @@ export default function Education() {
       "0 0 25px rgba(0, 212, 255, 0.6), 0 0 15px rgba(108, 92, 231, 0.4)",
     ]
   );
-  const dotBorder = useTransform(
+  const rawDotBorder = useTransform(
     scrollYProgress,
     [0, 1],
     ["rgba(148, 163, 184, 0.4)", "#00d4ff"]
   );
+
+  const dotScale = shouldReduceMotion ? 1 : rawDotScale;
+  const dotShadow = shouldReduceMotion
+    ? "0 0 15px rgba(0, 212, 255, 0.4)"
+    : rawDotShadow;
+  const dotBorder = shouldReduceMotion ? "#00d4ff" : rawDotBorder;
 
   const coursework = [
     "Data Structures & Algorithms",
@@ -56,7 +63,7 @@ export default function Education() {
       <div className="max-w-4xl mx-auto">
         {/* Section Header */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.6 }}
@@ -97,14 +104,18 @@ export default function Education() {
 
           {/* Education Card */}
           <motion.div
-            initial={{ opacity: 0, y: 35 }}
+            initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 35 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
-            whileHover={{
-              y: -6,
-              boxShadow: "0 25px 45px -12px rgba(108, 92, 231, 0.25)",
-            }}
+            whileHover={
+              shouldReduceMotion
+                ? { opacity: 0.95 }
+                : {
+                    y: -6,
+                    boxShadow: "0 25px 45px -12px rgba(108, 92, 231, 0.25)",
+                  }
+            }
             data-cursor="hover"
             className="group relative rounded-3xl bg-white/90 dark:bg-navy-card/90 border border-slate-200 dark:border-navy-border shadow-xl backdrop-blur-md overflow-hidden p-6 sm:p-10 transition-all duration-300"
           >

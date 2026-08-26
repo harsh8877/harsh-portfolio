@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import {
   FiBriefcase,
   FiCalendar,
@@ -66,6 +66,7 @@ const EXPERIENCES = [
 ];
 
 function TimelineRow({ exp, idx, total, scrollYProgress }) {
+  const shouldReduceMotion = useReducedMotion();
   const isEven = idx % 2 === 0;
 
   // Calculate when the drawn timeline line reaches this specific dot
@@ -74,19 +75,25 @@ function TimelineRow({ exp, idx, total, scrollYProgress }) {
   const endRange = Math.min(1, triggerPoint * 0.7 + 0.15);
 
   // Scroll-connected illumination physics
-  const dotScale = useTransform(scrollYProgress, [startRange, endRange], [0.9, 1.15]);
-  const dotBorder = useTransform(
+  const rawDotScale = useTransform(scrollYProgress, [startRange, endRange], [0.9, 1.15]);
+  const rawDotBorder = useTransform(
     scrollYProgress,
     [startRange, endRange],
     ["rgba(148, 163, 184, 0.4)", exp.glowColor]
   );
-  const dotShadow = useTransform(
+  const rawDotShadow = useTransform(
     scrollYProgress,
     [startRange, endRange],
     ["0 0 0 rgba(0,0,0,0)", `0 0 25px ${exp.glowColor}90`]
   );
-  const innerDotScale = useTransform(scrollYProgress, [startRange, endRange], [0.6, 1]);
-  const innerDotOpacity = useTransform(scrollYProgress, [startRange, endRange], [0.4, 1]);
+  const rawInnerDotScale = useTransform(scrollYProgress, [startRange, endRange], [0.6, 1]);
+  const rawInnerDotOpacity = useTransform(scrollYProgress, [startRange, endRange], [0.4, 1]);
+
+  const dotScale = shouldReduceMotion ? 1 : rawDotScale;
+  const dotBorder = shouldReduceMotion ? exp.glowColor : rawDotBorder;
+  const dotShadow = shouldReduceMotion ? `0 0 15px ${exp.glowColor}40` : rawDotShadow;
+  const innerDotScale = shouldReduceMotion ? 1 : rawInnerDotScale;
+  const innerDotOpacity = shouldReduceMotion ? 1 : rawInnerDotOpacity;
 
   return (
     <div className="relative flex flex-col md:flex-row items-start md:items-center">
@@ -117,8 +124,8 @@ function TimelineRow({ exp, idx, total, scrollYProgress }) {
         <motion.div
           initial={{
             opacity: 0,
-            x: isEven ? -40 : 40,
-            y: 20,
+            x: shouldReduceMotion ? 0 : (isEven ? -40 : 40),
+            y: shouldReduceMotion ? 0 : 20,
           }}
           whileInView={{
             opacity: 1,
@@ -127,10 +134,14 @@ function TimelineRow({ exp, idx, total, scrollYProgress }) {
           }}
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
-          whileHover={{
-            y: -5,
-            boxShadow: `0 20px 35px -10px ${exp.glowColor}25`,
-          }}
+          whileHover={
+            shouldReduceMotion
+              ? { opacity: 0.95 }
+              : {
+                  y: -5,
+                  boxShadow: `0 20px 35px -10px ${exp.glowColor}25`,
+                }
+          }
           data-cursor="hover"
           className="group relative p-6 sm:p-8 rounded-2xl bg-white/85 dark:bg-navy-card/90 border border-slate-200 dark:border-navy-border shadow-lg backdrop-blur-md transition-all duration-300 overflow-hidden text-left"
         >
@@ -211,6 +222,7 @@ function TimelineRow({ exp, idx, total, scrollYProgress }) {
 
 export default function Experience() {
   const containerRef = useRef(null);
+  const shouldReduceMotion = useReducedMotion();
 
   // Track scroll through the timeline section
   const { scrollYProgress } = useScroll({
@@ -219,7 +231,8 @@ export default function Experience() {
   });
 
   // Smoothly draw the timeline line from top to bottom
-  const lineHeight = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
+  const rawLineHeight = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
+  const lineHeight = shouldReduceMotion ? "100%" : rawLineHeight;
 
   return (
     <section
@@ -234,7 +247,7 @@ export default function Experience() {
       <div className="max-w-6xl mx-auto">
         {/* Section Header */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.6 }}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { motion, useInView, useMotionValue, animate } from "framer-motion";
+import { motion, useInView, useMotionValue, animate, useReducedMotion } from "framer-motion";
 import {
   FiBriefcase,
   FiCode,
@@ -15,13 +15,14 @@ import { useLenis } from "@/components/SmoothScrollProvider";
 
 // Animated counter component for stat badges
 function AnimatedCounter({ value, suffix = "", prefix = "" }) {
+  const shouldReduceMotion = useReducedMotion();
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.4 });
   const count = useMotionValue(0);
   const [displayValue, setDisplayValue] = useState(0);
 
   useEffect(() => {
-    if (isInView && typeof value === "number") {
+    if (!shouldReduceMotion && isInView && typeof value === "number") {
       const controls = animate(count, value, {
         duration: 1.5,
         ease: "easeOut",
@@ -31,10 +32,16 @@ function AnimatedCounter({ value, suffix = "", prefix = "" }) {
       });
       return () => controls.stop();
     }
-  }, [isInView, count, value]);
+  }, [isInView, count, value, shouldReduceMotion]);
 
-  if (typeof value !== "number") {
-    return <span>{value}</span>;
+  if (typeof value !== "number" || shouldReduceMotion) {
+    return (
+      <span>
+        {prefix}
+        {value}
+        {suffix}
+      </span>
+    );
   }
 
   return (
@@ -48,6 +55,7 @@ function AnimatedCounter({ value, suffix = "", prefix = "" }) {
 
 export default function About() {
   const lenis = useLenis();
+  const shouldReduceMotion = useReducedMotion();
 
   const scrollToProjects = (e) => {
     e.preventDefault();
@@ -116,7 +124,7 @@ export default function About() {
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.6 }}
@@ -141,7 +149,7 @@ export default function About() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
           {/* Left Column: Profile Photo Card */}
           <motion.div
-            initial={{ opacity: 0, x: -40 }}
+            initial={{ opacity: 0, x: shouldReduceMotion ? 0 : -40 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.7, ease: "easeOut" }}
@@ -196,7 +204,7 @@ export default function About() {
 
           {/* Right Column: Bio Narrative & Stats */}
           <motion.div
-            initial={{ opacity: 0, x: 40 }}
+            initial={{ opacity: 0, x: shouldReduceMotion ? 0 : 40 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.7, ease: "easeOut" }}

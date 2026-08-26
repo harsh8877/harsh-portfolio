@@ -7,6 +7,7 @@ import {
   useMotionValue,
   useSpring,
   useTransform,
+  useReducedMotion,
 } from "framer-motion";
 import {
   FiExternalLink,
@@ -147,6 +148,7 @@ const containerVariants = {
 
 // 3D Tilt Project Card Component
 function ProjectTiltCard({ project, onSelect }) {
+  const shouldReduceMotion = useReducedMotion();
   const cardRef = useRef(null);
 
   // Normalized mouse coordinates relative to badge center (-0.5 to 0.5)
@@ -163,7 +165,7 @@ function ProjectTiltCard({ project, onSelect }) {
   const glareY = useTransform(mouseYSpring, [-0.5, 0.5], ["0%", "100%"]);
 
   const handleMouseMove = (e) => {
-    if (!cardRef.current) return;
+    if (shouldReduceMotion || !cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
@@ -176,6 +178,7 @@ function ProjectTiltCard({ project, onSelect }) {
   };
 
   const handleMouseLeave = () => {
+    if (shouldReduceMotion) return;
     x.set(0);
     y.set(0);
   };
@@ -183,20 +186,24 @@ function ProjectTiltCard({ project, onSelect }) {
   return (
     <motion.div
       ref={cardRef}
-      layoutId={`project-card-${project.id}`}
+      layoutId={shouldReduceMotion ? undefined : `project-card-${project.id}`}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       onClick={() => onSelect(project)}
       data-cursor="hover"
       style={{
-        rotateX,
-        rotateY,
-        transformStyle: "preserve-3d",
+        rotateX: shouldReduceMotion ? 0 : rotateX,
+        rotateY: shouldReduceMotion ? 0 : rotateY,
+        transformStyle: shouldReduceMotion ? "flat" : "preserve-3d",
       }}
-      whileHover={{
-        y: -6,
-        boxShadow: `0 24px 45px -15px ${project.accentColor}40`,
-      }}
+      whileHover={
+        shouldReduceMotion
+          ? { opacity: 0.95 }
+          : {
+              y: -6,
+              boxShadow: `0 24px 45px -15px ${project.accentColor}40`,
+            }
+      }
       transition={{
         type: "spring",
         stiffness: 280,
@@ -205,12 +212,14 @@ function ProjectTiltCard({ project, onSelect }) {
       className="group project-card relative flex flex-col justify-between rounded-3xl bg-white/95 dark:bg-navy-card/95 border border-slate-200 dark:border-navy-border shadow-lg backdrop-blur-md overflow-hidden cursor-pointer will-change-transform select-none"
     >
       {/* Dynamic Cursor Glare Overlay */}
-      <motion.div
-        className="pointer-events-none absolute inset-0 z-30 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-        style={{
-          background: `radial-gradient(500px circle at ${glareX} ${glareY}, rgba(255,255,255,0.16), transparent 60%)`,
-        }}
-      />
+      {!shouldReduceMotion && (
+        <motion.div
+          className="pointer-events-none absolute inset-0 z-30 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          style={{
+            background: `radial-gradient(500px circle at ${glareX} ${glareY}, rgba(255,255,255,0.16), transparent 60%)`,
+          }}
+        />
+      )}
 
       {/* Top Accent Gradient Bar */}
       <motion.div
@@ -355,6 +364,7 @@ function ProjectTiltCard({ project, onSelect }) {
 
 export default function Projects() {
   const [selectedProject, setSelectedProject] = useState(null);
+  const shouldReduceMotion = useReducedMotion();
 
   // Lock body scroll when modal is active
   useEffect(() => {
@@ -389,7 +399,7 @@ export default function Projects() {
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.6 }}
@@ -416,7 +426,7 @@ export default function Projects() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.1 }}
-          style={{ perspective: 1000 }}
+          style={{ perspective: shouldReduceMotion ? "none" : 1000 }}
           className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10"
         >
           {PROJECTS_DATA.map((project) => (
@@ -445,13 +455,20 @@ export default function Projects() {
 
             {/* Modal Content Box with matching layoutId for fluid morphing */}
             <motion.div
-              layoutId={`project-card-${selectedProject.id}`}
-              transition={{ type: "spring", damping: 28, stiffness: 260 }}
+              layoutId={shouldReduceMotion ? undefined : `project-card-${selectedProject.id}`}
+              initial={shouldReduceMotion ? { opacity: 0, scale: 0.95 } : undefined}
+              animate={shouldReduceMotion ? { opacity: 1, scale: 1 } : undefined}
+              exit={shouldReduceMotion ? { opacity: 0, scale: 0.95 } : undefined}
+              transition={
+                shouldReduceMotion
+                  ? { duration: 0.2 }
+                  : { type: "spring", damping: 28, stiffness: 260 }
+              }
               className="relative w-full max-w-2xl max-h-[85vh] sm:max-h-[90vh] bg-white dark:bg-navy-card rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-navy-border shadow-2xl overflow-y-auto z-50 my-auto p-5 sm:p-8"
             >
               {/* Top Accent Gradient Bar in Modal */}
               <motion.div
-                layoutId={`project-gradient-${selectedProject.id}`}
+                layoutId={shouldReduceMotion ? undefined : `project-gradient-${selectedProject.id}`}
                 className={`absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r ${selectedProject.gradient}`}
               />
 

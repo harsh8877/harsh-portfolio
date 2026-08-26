@@ -7,6 +7,7 @@ import {
   useMotionValue,
   useSpring,
   useTransform,
+  useReducedMotion,
 } from "framer-motion";
 import {
   SiHtml5,
@@ -206,6 +207,7 @@ const itemVariants = {
 
 // 3D Tilt Skill Badge Component
 function SkillTiltCard({ skill }) {
+  const shouldReduceMotion = useReducedMotion();
   const cardRef = useRef(null);
 
   // Normalized mouse coordinates relative to badge center (-0.5 to 0.5)
@@ -223,7 +225,7 @@ function SkillTiltCard({ skill }) {
   const glowY = useTransform(mouseYSpring, [-0.5, 0.5], ["10%", "90%"]);
 
   const handleMouseMove = (e) => {
-    if (!cardRef.current) return;
+    if (shouldReduceMotion || !cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
     const width = rect.width;
     const height = rect.height;
@@ -239,6 +241,7 @@ function SkillTiltCard({ skill }) {
   };
 
   const handleMouseLeave = () => {
+    if (shouldReduceMotion) return;
     x.set(0);
     y.set(0);
   };
@@ -254,28 +257,34 @@ function SkillTiltCard({ skill }) {
       onMouseLeave={handleMouseLeave}
       data-cursor="hover"
       style={{
-        rotateX,
-        rotateY,
-        transformStyle: "preserve-3d",
+        rotateX: shouldReduceMotion ? 0 : rotateX,
+        rotateY: shouldReduceMotion ? 0 : rotateY,
+        transformStyle: shouldReduceMotion ? "flat" : "preserve-3d",
       }}
-      whileHover={{
-        scale: 1.06,
-        y: -5,
-        boxShadow: `0 20px 35px -10px ${skill.color}35`,
-        borderColor: `${skill.color}80`,
-      }}
-      whileTap={{ scale: 0.96 }}
+      whileHover={
+        shouldReduceMotion
+          ? { opacity: 0.95 }
+          : {
+              scale: 1.06,
+              y: -5,
+              boxShadow: `0 20px 35px -10px ${skill.color}35`,
+              borderColor: `${skill.color}80`,
+            }
+      }
+      whileTap={shouldReduceMotion ? undefined : { scale: 0.96 }}
       className="group relative flex flex-col items-center justify-between p-3.5 sm:p-5 rounded-2xl bg-white/85 dark:bg-navy-card/90 border border-slate-200 dark:border-navy-border shadow-sm hover:shadow-xl backdrop-blur-md transition-colors duration-200 cursor-pointer overflow-hidden min-h-[135px] sm:min-h-[155px] select-none will-change-transform"
     >
       {/* Dynamic 3D Cursor Ambient Glow */}
-      <motion.div
-        className="absolute w-28 h-28 rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-300 blur-xl pointer-events-none -translate-x-1/2 -translate-y-1/2"
-        style={{
-          backgroundColor: skill.color,
-          left: glowX,
-          top: glowY,
-        }}
-      />
+      {!shouldReduceMotion && (
+        <motion.div
+          className="absolute w-28 h-28 rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-300 blur-xl pointer-events-none -translate-x-1/2 -translate-y-1/2"
+          style={{
+            backgroundColor: skill.color,
+            left: glowX,
+            top: glowY,
+          }}
+        />
+      )}
 
       {/* Skill Icon with 3D Pop (translateZ) */}
       <div

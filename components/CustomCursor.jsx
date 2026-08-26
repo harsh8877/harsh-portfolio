@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion, useMotionValue, useSpring } from "framer-motion";
+import { motion, useMotionValue, useSpring, useReducedMotion } from "framer-motion";
 
 export default function CustomCursor() {
+  const shouldReduceMotion = useReducedMotion();
   const [isHovered, setIsHovered] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [isTouchDevice, setIsTouchDevice] = useState(true);
@@ -79,8 +80,8 @@ export default function CustomCursor() {
     };
   }, [mouseX, mouseY, isVisible]);
 
-  // If on a mobile/touch device, don't render custom cursor
-  if (isTouchDevice) {
+  // If on a mobile/touch device or prefers-reduced-motion is active, don't render custom cursor
+  if (isTouchDevice || shouldReduceMotion) {
     return null;
   }
 

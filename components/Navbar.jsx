@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import { FiSun, FiMoon, FiMenu, FiX } from "react-icons/fi";
 import { useLenis } from "./SmoothScrollProvider";
 import Magnetic from "./Magnetic";
@@ -174,39 +174,47 @@ export default function Navbar() {
     }
   };
 
+  const shouldReduceMotion = useReducedMotion();
+
   // Drawer animation variants with staggered item fade-in
   const drawerContainerVariants = {
     closed: {
       x: "100%",
-      transition: {
-        type: "spring",
-        damping: 30,
-        stiffness: 300,
-      },
+      transition: shouldReduceMotion
+        ? { duration: 0.2 }
+        : {
+            type: "spring",
+            damping: 30,
+            stiffness: 300,
+          },
     },
     open: {
       x: 0,
-      transition: {
-        type: "spring",
-        damping: 25,
-        stiffness: 220,
-        staggerChildren: 0.05,
-        delayChildren: 0.1,
-      },
+      transition: shouldReduceMotion
+        ? { duration: 0.2 }
+        : {
+            type: "spring",
+            damping: 25,
+            stiffness: 220,
+            staggerChildren: 0.05,
+            delayChildren: 0.1,
+          },
     },
   };
 
   const drawerItemVariants = {
-    closed: { opacity: 0, x: 25, y: 10 },
+    closed: { opacity: 0, x: shouldReduceMotion ? 0 : 25, y: shouldReduceMotion ? 0 : 10 },
     open: {
       opacity: 1,
       x: 0,
       y: 0,
-      transition: {
-        type: "spring",
-        damping: 20,
-        stiffness: 300,
-      },
+      transition: shouldReduceMotion
+        ? { duration: 0.15 }
+        : {
+            type: "spring",
+            damping: 20,
+            stiffness: 300,
+          },
     },
   };
 

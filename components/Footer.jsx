@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import {
   FiGithub,
   FiLinkedin,
@@ -11,32 +11,35 @@ import {
 import { useLenis } from "./SmoothScrollProvider";
 import Magnetic from "./Magnetic";
 
-const footerContainerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.12,
-      delayChildren: 0.1,
-    },
-  },
-};
-
-const footerItemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.55,
-      ease: "easeOut",
-    },
-  },
-};
-
 export default function Footer() {
   const lenis = useLenis();
+  const shouldReduceMotion = useReducedMotion();
   const [showBackToTop, setShowBackToTop] = useState(false);
+
+  const footerContainerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: shouldReduceMotion
+        ? { duration: 0.3 }
+        : {
+            staggerChildren: 0.12,
+            delayChildren: 0.1,
+          },
+    },
+  };
+
+  const footerItemVariants = {
+    hidden: { opacity: 0, y: shouldReduceMotion ? 0 : 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: shouldReduceMotion ? 0.2 : 0.55,
+        ease: "easeOut",
+      },
+    },
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -219,15 +222,16 @@ export default function Footer() {
       <AnimatePresence>
         {showBackToTop && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.7, y: 20 }}
+            initial={{ opacity: 0, scale: shouldReduceMotion ? 1 : 0.7, y: shouldReduceMotion ? 0 : 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.7, y: 20 }}
+            exit={{ opacity: 0, scale: shouldReduceMotion ? 1 : 0.7, y: shouldReduceMotion ? 0 : 20 }}
+            transition={shouldReduceMotion ? { duration: 0.2 } : undefined}
             className="fixed bottom-6 right-6 z-40"
           >
             <Magnetic maxDistance={12}>
               <motion.button
-                whileHover={{ scale: 1.08 }}
-                whileTap={{ scale: 0.92 }}
+                whileHover={shouldReduceMotion ? undefined : { scale: 1.08 }}
+                whileTap={shouldReduceMotion ? undefined : { scale: 0.92 }}
                 onClick={scrollToTop}
                 data-cursor="hover"
                 aria-label="Back to top"
