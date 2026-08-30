@@ -196,35 +196,18 @@ export default function Navbar() {
             type: "spring",
             damping: 25,
             stiffness: 220,
-            staggerChildren: 0.05,
-            delayChildren: 0.1,
-          },
-    },
-  };
-
-  const drawerItemVariants = {
-    closed: { opacity: 0, x: shouldReduceMotion ? 0 : 25, y: shouldReduceMotion ? 0 : 10 },
-    open: {
-      opacity: 1,
-      x: 0,
-      y: 0,
-      transition: shouldReduceMotion
-        ? { duration: 0.15 }
-        : {
-            type: "spring",
-            damping: 20,
-            stiffness: 300,
           },
     },
   };
 
   return (
-    <motion.header
-      style={{
-        paddingTop: navPadding,
-        paddingBottom: navPadding,
-        backgroundColor: darkMode ? navBgDark : navBgLight,
-        borderBottomColor: darkMode ? navBorderDark : navBorderLight,
+    <>
+      <motion.header
+        style={{
+          paddingTop: navPadding,
+          paddingBottom: navPadding,
+          backgroundColor: darkMode ? navBgDark : navBgLight,
+          borderBottomColor: darkMode ? navBorderDark : navBorderLight,
         boxShadow: navShadow,
         backdropFilter: navBlur,
         WebkitBackdropFilter: navBlur,
@@ -346,73 +329,90 @@ export default function Navbar() {
           </div>
         </div>
       </div>
+    </motion.header>
 
       {/* Mobile Drawer Navigation */}
       <AnimatePresence>
         {isMobileMenuOpen && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="fixed inset-0 top-[65px] bg-black/60 backdrop-blur-sm z-40 md:hidden"
-            />
+          <motion.div
+            key="mobile-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden"
+          />
+        )}
+      </AnimatePresence>
 
-            {/* Slide-in Drawer with Staggered Items */}
-            <motion.div
-              variants={drawerContainerVariants}
-              initial="closed"
-              animate="open"
-              exit="closed"
-              className="fixed right-0 top-[65px] bottom-0 w-[80%] max-w-sm bg-white/95 dark:bg-navy-card/95 backdrop-blur-2xl border-l border-slate-200 dark:border-navy-border z-50 p-6 flex flex-col justify-between shadow-2xl md:hidden overflow-y-auto"
-            >
-              <div className="space-y-2">
-                <p className="text-xs uppercase font-bold tracking-wider text-slate-400 dark:text-slate-500 mb-4">
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            key="mobile-drawer"
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "100%" }}
+            transition={{ type: "tween", duration: 0.3 }}
+            className="fixed right-0 top-0 bottom-0 w-[80%] max-w-sm bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 z-50 p-6 shadow-2xl md:hidden overflow-y-auto"
+          >
+            <div className="flex flex-col h-full justify-between">
+              <div>
+                {/* Mobile Drawer Header */}
+                <div className="flex items-center justify-between mb-8">
+                  <span className="text-lg font-bold font-poppins text-slate-900 dark:text-white">
+                    Menu
+                  </span>
+                  <button
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-violet-accent dark:hover:text-[#00d4ff] transition-colors"
+                  >
+                    <FiX className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <div className="space-y-4">
+                  <p className="text-sm uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400 mb-2">
                   Navigation
                 </p>
-                {NAV_LINKS.map((link) => {
-                  const isActive = activeSection === link.href.replace("#", "");
-                  return (
-                    <motion.a
-                      key={link.name}
-                      href={link.href}
-                      variants={drawerItemVariants}
-                      data-cursor="hover"
-                      onClick={(e) => handleNavClick(e, link.href)}
-                      className={`flex items-center justify-between px-4 py-3 rounded-xl text-base font-medium transition-all duration-200 ${
-                        isActive
-                          ? "bg-violet-accent/10 dark:bg-electric-blue/10 text-violet-accent dark:text-electric-blue font-semibold border border-violet-accent/20 dark:border-electric-blue/20"
-                          : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-navy-light/60 hover:text-slate-900 dark:hover:text-white"
-                      }`}
-                    >
-                      <span>{link.name}</span>
-                      {isActive && (
-                        <span className="h-2 w-2 rounded-full bg-violet-accent dark:bg-electric-blue shadow-[0_0_8px_#00d4ff]" />
-                      )}
-                    </motion.a>
-                  );
-                })}
+                <div className="flex flex-col gap-2">
+                  {NAV_LINKS.map((link) => {
+                    const isActive = activeSection === link.href.replace("#", "");
+                    return (
+                      <a
+                        key={link.name}
+                        href={link.href}
+                        onClick={(e) => {
+                          handleNavClick(e, link.href);
+                          setIsMobileMenuOpen(false);
+                        }}
+                        className={`block w-full px-4 py-3 rounded-xl text-base font-medium transition-colors ${
+                          isActive
+                            ? "bg-violet-500/10 text-violet-600 dark:bg-[#00d4ff]/10 dark:text-[#00d4ff] font-bold border border-violet-500/20 dark:border-[#00d4ff]/20"
+                            : "text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+                        }`}
+                      >
+                        {link.name}
+                      </a>
+                    );
+                  })}
+                </div>
               </div>
+            </div>
 
-              {/* Drawer Bottom Info */}
-              <motion.div
-                variants={drawerItemVariants}
-                className="pt-6 border-t border-slate-200 dark:border-navy-border/60"
-              >
+            {/* Drawer Bottom Info */}
+            <div className="pt-6 border-t border-slate-200 dark:border-slate-800 mt-8">
                 <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
                   <span>Theme: {darkMode ? "Dark Navy" : "Light"}</span>
-                  <span className="text-violet-accent dark:text-electric-blue font-medium">
+                  <span className="font-medium text-[#6c5ce7] dark:text-[#00d4ff]">
                     HV Portfolio
                   </span>
                 </div>
-              </motion.div>
-            </motion.div>
-          </>
+              </div>
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
-    </motion.header>
+    </>
   );
 }
