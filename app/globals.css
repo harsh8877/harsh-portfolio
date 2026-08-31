@@ -44,22 +44,15 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Custom dark scrollbar */
+/* Hide scrollbar since Lenis handles smooth scrolling */
 ::-webkit-scrollbar {
-  width: 8px;
+  display: none;
+  width: 0px;
 }
 
-::-webkit-scrollbar-track {
-  background: #0a0a1a;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #242456;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #6c5ce7;
+html, body {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
 }
 
 /* Selection highlight */

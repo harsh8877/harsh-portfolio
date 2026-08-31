@@ -366,12 +366,18 @@ export default function Projects() {
   const [selectedProject, setSelectedProject] = useState(null);
   const shouldReduceMotion = useReducedMotion();
 
-  // Lock body scroll when modal is active
+  // Lock body scroll and Lenis when modal is active
   useEffect(() => {
     if (selectedProject) {
       document.body.style.overflow = "hidden";
+      if (typeof window !== "undefined" && window.lenis) {
+        window.lenis.stop();
+      }
     } else {
       document.body.style.overflow = "unset";
+      if (typeof window !== "undefined" && window.lenis) {
+        window.lenis.start();
+      }
     }
 
     const handleKeyDown = (e) => {
@@ -384,6 +390,9 @@ export default function Projects() {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = "unset";
+      if (typeof window !== "undefined" && window.lenis) {
+        window.lenis.start();
+      }
     };
   }, [selectedProject]);
 
@@ -442,7 +451,7 @@ export default function Projects() {
       {/* Animated Modal Dialog for Full Project Details with shared layoutId */}
       <AnimatePresence>
         {selectedProject && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
             {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
@@ -464,109 +473,118 @@ export default function Projects() {
                   ? { duration: 0.2 }
                   : { type: "spring", damping: 28, stiffness: 260 }
               }
-              className="relative w-full max-w-2xl max-h-[85vh] sm:max-h-[90vh] bg-white dark:bg-navy-card rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-navy-border shadow-2xl overflow-y-auto z-50 my-auto p-5 sm:p-8"
+              className="relative w-full max-w-2xl max-h-[85vh] sm:max-h-[90vh] bg-white dark:bg-navy-card rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-navy-border shadow-2xl flex flex-col z-50 my-auto overflow-hidden"
             >
               {/* Top Accent Gradient Bar in Modal */}
               <motion.div
                 layoutId={shouldReduceMotion ? undefined : `project-gradient-${selectedProject.id}`}
-                className={`absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r ${selectedProject.gradient}`}
+                className={`absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r ${selectedProject.gradient} z-20`}
               />
 
-              {/* Close Button */}
-              <button
-                onClick={() => setSelectedProject(null)}
-                aria-label="Close project modal"
-                data-cursor="hover"
-                className="absolute top-4 right-4 sm:top-5 sm:right-5 p-2.5 rounded-full bg-slate-100 dark:bg-navy-light text-slate-600 dark:text-slate-300 hover:text-violet-accent dark:hover:text-electric-blue hover:bg-slate-200 dark:hover:bg-navy-border transition-colors cursor-pointer z-20 min-w-[40px] min-h-[40px] flex items-center justify-center"
-              >
-                <FiX className="w-5 h-5" />
-              </button>
+              {/* Fixed Header with Close Button */}
+              <div className="relative pt-6 sm:pt-7 pb-3 px-5 sm:px-8 shrink-0 flex justify-between items-start z-10">
+                {/* Category & Badge */}
+                <div className="flex flex-wrap items-center gap-2 pr-12 mt-1">
+                  <motion.span
+                    layoutId={`project-badge-${selectedProject.id}`}
+                    className="text-xs font-semibold uppercase tracking-wider text-violet-accent dark:text-electric-blue bg-violet-accent/10 dark:bg-electric-blue/10 px-3 py-1 rounded-full border border-violet-accent/20 dark:border-electric-blue/20"
+                  >
+                    {selectedProject.category}
+                  </motion.span>
+                  <span className="text-xs text-slate-400">•</span>
+                  <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                    {selectedProject.featuredBadge}
+                  </span>
+                </div>
 
-              {/* Category & Badge */}
-              <div className="flex flex-wrap items-center gap-2 mb-3 pr-8 pt-2">
-                <motion.span
-                  layoutId={`project-badge-${selectedProject.id}`}
-                  className="text-xs font-semibold uppercase tracking-wider text-violet-accent dark:text-electric-blue bg-violet-accent/10 dark:bg-electric-blue/10 px-3 py-1 rounded-full border border-violet-accent/20 dark:border-electric-blue/20"
+                {/* Close Button */}
+                <button
+                  onClick={() => setSelectedProject(null)}
+                  aria-label="Close project modal"
+                  data-cursor="hover"
+                  className="absolute top-5 right-4 sm:top-6 sm:right-6 p-2 rounded-full bg-slate-100 dark:bg-navy-light text-slate-600 dark:text-slate-300 hover:text-violet-accent dark:hover:text-electric-blue hover:bg-slate-200 dark:hover:bg-navy-border transition-colors cursor-pointer z-20 flex items-center justify-center"
                 >
-                  {selectedProject.category}
-                </motion.span>
-                <span className="text-xs text-slate-400">•</span>
-                <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                  {selectedProject.featuredBadge}
-                </span>
+                  <FiX className="w-5 h-5" />
+                </button>
               </div>
 
-              {/* Title */}
-              <motion.h3
-                layoutId={`project-title-${selectedProject.id}`}
-                className="text-xl sm:text-3xl font-extrabold font-poppins text-slate-900 dark:text-white mb-4 pr-6 leading-tight"
+              {/* Scrollable Content Area */}
+              <div
+                className="overflow-y-auto px-5 sm:px-8 pb-6 sm:pb-8 flex-1"
+                data-lenis-prevent="true"
               >
-                {selectedProject.title}
-              </motion.h3>
+                {/* Title */}
+                <motion.h3
+                  layoutId={`project-title-${selectedProject.id}`}
+                  className="text-xl sm:text-3xl font-extrabold font-poppins text-slate-900 dark:text-white mb-4 pr-6 leading-tight mt-2"
+                >
+                  {selectedProject.title}
+                </motion.h3>
 
-              {/* Full Overview Paragraph */}
-              <p className="text-xs sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed mb-6">
-                {selectedProject.fullOverview}
-              </p>
+                {/* Full Overview Paragraph */}
+                <p className="text-xs sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed mb-6">
+                  {selectedProject.fullOverview}
+                </p>
 
-              {/* Key Highlights & Architecture Points */}
-              <div className="mb-6">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-3 flex items-center gap-2">
-                  <FiLayers className="w-4 h-4 text-violet-accent dark:text-electric-blue" />
-                  Key Architecture &amp; Features
-                </h4>
-                <div className="space-y-2.5 bg-slate-50 dark:bg-navy-dark/60 p-4 sm:p-5 rounded-2xl border border-slate-200/80 dark:border-navy-border/60">
-                  {selectedProject.highlights.map((highlight, idx) => (
-                    <div key={idx} className="flex items-start gap-2.5">
-                      <FiCheckCircle className="w-4 h-4 text-emerald-500 dark:text-emerald-400 shrink-0 mt-0.5" />
-                      <span className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
-                        {highlight}
+                {/* Key Highlights & Architecture Points */}
+                <div className="mb-6">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-3 flex items-center gap-2">
+                    <FiLayers className="w-4 h-4 text-violet-accent dark:text-electric-blue" />
+                    Key Architecture &amp; Features
+                  </h4>
+                  <div className="space-y-2.5 bg-slate-50 dark:bg-navy-dark/60 p-4 sm:p-5 rounded-2xl border border-slate-200/80 dark:border-navy-border/60">
+                    {selectedProject.highlights.map((highlight, idx) => (
+                      <div key={idx} className="flex items-start gap-2.5">
+                        <FiCheckCircle className="w-4 h-4 text-emerald-500 dark:text-emerald-400 shrink-0 mt-0.5" />
+                        <span className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+                          {highlight}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Tech Stack */}
+                <div className="mb-8">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-3">
+                    Technologies &amp; Libraries
+                  </h4>
+                  <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                    {selectedProject.techStack.map((tech) => (
+                      <span
+                        key={tech}
+                        className="px-2.5 sm:px-3 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-navy-light text-slate-800 dark:text-slate-200 border border-slate-200/80 dark:border-navy-border"
+                      >
+                        {tech}
                       </span>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
 
-              {/* Tech Stack */}
-              <div className="mb-8">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-3">
-                  Technologies &amp; Libraries
-                </h4>
-                <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                  {selectedProject.techStack.map((tech) => (
-                    <span
-                      key={tech}
-                      className="px-2.5 sm:px-3 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-navy-light text-slate-800 dark:text-slate-200 border border-slate-200/80 dark:border-navy-border"
-                    >
-                      {tech}
-                    </span>
-                  ))}
+                {/* Modal Bottom Buttons */}
+                <div className="pt-4 border-t border-slate-200 dark:border-navy-border/60 flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2.5 sm:gap-3">
+                  <a
+                    href={selectedProject.githubUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-cursor="hover"
+                    className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl border border-slate-300 dark:border-navy-border bg-white dark:bg-navy-card text-slate-700 dark:text-slate-200 hover:text-violet-accent dark:hover:text-electric-blue font-medium text-xs sm:text-sm transition-colors cursor-pointer min-h-[44px]"
+                  >
+                    <FiGithub className="w-4 h-4" />
+                    <span>GitHub Code</span>
+                  </a>
+
+                  <a
+                    href={selectedProject.demoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-cursor="hover"
+                    className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-violet-accent to-electric-blue text-white font-medium text-xs sm:text-sm shadow-md shadow-violet-accent/25 hover:shadow-electric-blue/30 transition-all cursor-pointer min-h-[44px]"
+                  >
+                    <span>Live Preview</span>
+                    <FiExternalLink className="w-4 h-4" />
+                  </a>
                 </div>
-              </div>
-
-              {/* Modal Bottom Buttons */}
-              <div className="pt-4 border-t border-slate-200 dark:border-navy-border/60 flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2.5 sm:gap-3">
-                <a
-                  href={selectedProject.githubUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  data-cursor="hover"
-                  className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl border border-slate-300 dark:border-navy-border bg-white dark:bg-navy-card text-slate-700 dark:text-slate-200 hover:text-violet-accent dark:hover:text-electric-blue font-medium text-xs sm:text-sm transition-colors cursor-pointer min-h-[44px]"
-                >
-                  <FiGithub className="w-4 h-4" />
-                  <span>GitHub Code</span>
-                </a>
-
-                <a
-                  href={selectedProject.demoUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  data-cursor="hover"
-                  className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-violet-accent to-electric-blue text-white font-medium text-xs sm:text-sm shadow-md shadow-violet-accent/25 hover:shadow-electric-blue/30 transition-all cursor-pointer min-h-[44px]"
-                >
-                  <span>Live Preview</span>
-                  <FiExternalLink className="w-4 h-4" />
-                </a>
               </div>
             </motion.div>
           </div>
