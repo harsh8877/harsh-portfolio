@@ -318,10 +318,9 @@ export default function Hero() {
             <motion.a
               whileHover={shouldReduceMotion ? undefined : { scale: 1.04 }}
               whileTap={shouldReduceMotion ? undefined : { scale: 0.96 }}
-              href="/resume.pdf"
+              href="/resume.pdf?v=2"
               target="_blank"
               rel="noopener noreferrer"
-              download="Harsh_Vasoya_Resume.pdf"
               data-cursor="hover"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 sm:px-7 py-3.5 rounded-xl bg-gradient-to-r from-violet-accent to-electric-blue text-white font-medium text-sm sm:text-base shadow-lg shadow-violet-accent/25 hover:shadow-electric-blue/30 transition-all duration-300 cursor-pointer min-h-[48px]"
             >
